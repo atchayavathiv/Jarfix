@@ -1,0 +1,3662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JarFix – NEXUS TECH 2K26</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #00ff41;
+  --green-dim: #00cc33;
+  --green-glow: rgba(0,255,65,0.4);
+  --cyan: #00ffff;
+  --red: #ff0040;
+  --gold: #ffd700;
+  --orange: #ff6600;
+  --bg: #000500;
+  --bg2: #050f05;
+  --bg3: #0a1a0a;
+  --card: rgba(0,20,0,0.85);
+  --border: rgba(0,255,65,0.3);
+  --text: #c8ffc8;
+  --text-dim: #5a8a5a;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;min-height:100%;background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;overflow-x:hidden;}
+
+/* MATRIX CANVAS */
+#matrix-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.18;}
+
+/* PAGES */
+.page{display:none;position:relative;z-index:10;min-height:100vh;}
+.page.active{display:block;}
+/* SINGLE PAGE SECTIONS */
+.section{display:none;}
+.section.active{display:block;}
+
+/* ===== LANDING PAGE ===== */
+#landing{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+/* 3D TILT CARD */
+.card-3d-scene{perspective:1500px;position:relative;width:380px;max-width:95vw;}
+.card-3d-grid{
+  position:absolute;inset:0;z-index:50;
+  display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);
+  pointer-events:none;
+}
+.card-3d-grid div{cursor:pointer;pointer-events:none;}
+.card-3d-inner{
+  position:absolute;inset:0;
+  transition:transform 0.3s ease-out;
+  transform-style:preserve-3d;
+}
+.card-3d-grid div:nth-child(1):hover ~ .card-3d-inner{transform:rotateX(8deg) rotateY(-8deg) scale(1.03);}
+.card-3d-grid div:nth-child(2):hover ~ .card-3d-inner{transform:rotateX(10deg) rotateY(0deg) scale(1.03);}
+.card-3d-grid div:nth-child(3):hover ~ .card-3d-inner{transform:rotateX(8deg) rotateY(8deg) scale(1.03);}
+.card-3d-grid div:nth-child(4):hover ~ .card-3d-inner{transform:rotateX(0deg) rotateY(-10deg) scale(1.03);}
+.card-3d-grid div:nth-child(5):hover ~ .card-3d-inner{transform:rotateX(0deg) rotateY(0deg) scale(1.05);}
+.card-3d-grid div:nth-child(6):hover ~ .card-3d-inner{transform:rotateX(0deg) rotateY(10deg) scale(1.03);}
+.card-3d-grid div:nth-child(7):hover ~ .card-3d-inner{transform:rotateX(-8deg) rotateY(-8deg) scale(1.03);}
+.card-3d-grid div:nth-child(8):hover ~ .card-3d-inner{transform:rotateX(-10deg) rotateY(0deg) scale(1.03);}
+.card-3d-grid div:nth-child(9):hover ~ .card-3d-inner{transform:rotateX(-8deg) rotateY(8deg) scale(1.03);}
+
+.card-3d-body{
+  position:relative;width:100%;height:100%;border-radius:20px;overflow:hidden;
+  box-shadow:0 0 80px rgba(0,255,65,0.35),0 25px 60px rgba(0,0,0,0.8);
+}
+.card-3d-border-spin{
+  position:absolute;inset:0;border-radius:20px;padding:2px;
+  background:conic-gradient(from 0deg,#00ff41,#00ffff,#00cc33,#ffd700,#00ff41);
+  animation:spinBorder 6s linear infinite;
+}
+@keyframes spinBorder{to{transform:rotate(360deg);}}
+.card-3d-border-inner{width:100%;height:100%;border-radius:18px;background:#000500;}
+.card-3d-content{
+  position:absolute;inset:2px;border-radius:18px;
+  background:linear-gradient(160deg,#000e00 0%,#001a05 40%,#000500 100%);
+  overflow:hidden;
+}
+.card-3d-shimmer{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,255,65,0.04) 0%,transparent 50%,rgba(0,255,65,0.04) 100%);
+}
+.card-bg-circuit{
+  position:absolute;inset:0;opacity:0.06;
+  background-image:
+    linear-gradient(var(--green) 1px,transparent 1px),
+    linear-gradient(90deg,var(--green) 1px,transparent 1px);
+  background-size:32px 32px;
+}
+@keyframes cardPulse{0%,100%{opacity:0.06;}50%{opacity:0.12;}}
+.card-bg-circuit{animation:cardPulse 4s ease-in-out infinite;}
+.landing-card{display:none;}
+
+.landing-title{font-family:'Orbitron',monospace;font-size:clamp(1.2rem,4vw,1.8rem);font-weight:900;color:var(--green);text-shadow:0 0 20px var(--green),0 0 40px var(--green-dim);letter-spacing:3px;margin-bottom:4px;}
+
+.btn-group{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:10px;}
+.btn{
+  font-family:'Orbitron',monospace;
+  font-size:0.75rem;
+  font-weight:700;
+  padding:12px 24px;
+  border:2px solid currentColor;
+  border-radius:6px;
+  cursor:pointer;
+  background:transparent;
+  letter-spacing:2px;
+  transition:all 0.3s;
+  position:relative;
+  overflow:hidden;
+  text-transform:uppercase;
+}
+.btn::before{content:'';position:absolute;inset:0;background:currentColor;opacity:0;transition:opacity 0.3s;}
+.btn:hover::before{opacity:0.12;}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.3);}
+.btn:active{transform:translateY(0);}
+.btn-green{color:var(--green);text-shadow:0 0 10px var(--green);}
+.btn-cyan{color:var(--cyan);text-shadow:0 0 10px var(--cyan);}
+.btn-red{color:var(--red);text-shadow:0 0 10px var(--red);}
+.btn-gold{color:var(--gold);text-shadow:0 0 10px var(--gold);}
+.btn-orange{color:var(--orange);text-shadow:0 0 10px var(--orange);}
+.btn-full{width:100%;}
+.btn-sm{font-size:0.65rem;padding:8px 16px;}
+
+/* Scan line overlay */
+.scanlines{pointer-events:none;position:fixed;inset:0;z-index:1;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);}
+
+/* ===== SECTION HEADERS ===== */
+.page-header{
+  background:linear-gradient(90deg,transparent,rgba(0,255,65,0.1),transparent);
+  border-bottom:1px solid var(--border);
+  padding:16px 24px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.page-header h1{font-family:'Orbitron',monospace;font-size:clamp(1rem,3vw,1.4rem);color:var(--green);text-shadow:0 0 10px var(--green);}
+.back-btn{background:transparent;border:1px solid var(--border);color:var(--green);padding:6px 14px;border-radius:4px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.65rem;transition:all 0.3s;}
+.back-btn:hover{border-color:var(--green);box-shadow:0 0 10px var(--green-glow);}
+
+/* ===== CARDS ===== */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:20px;
+  backdrop-filter:blur(4px);
+}
+.card-title{font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--green);margin-bottom:16px;text-transform:uppercase;letter-spacing:2px;}
+
+/* ===== FORMS ===== */
+.form-group{margin-bottom:16px;}
+label{display:block;font-size:0.8rem;color:var(--text-dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;}
+input,textarea,select{
+  width:100%;
+  background:rgba(0,20,0,0.8);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:10px 14px;
+  color:var(--text);
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.9rem;
+  transition:border-color 0.3s;
+}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--green);box-shadow:0 0 10px var(--green-glow);}
+input::placeholder{color:var(--text-dim);}
+
+/* ===== REGISTRATION PAGE ===== */
+#register-page{padding:0 0 40px;}
+.register-container{max-width:500px;margin:30px auto;padding:0 20px;}
+
+/* ===== LOBBY ===== */
+#lobby-page{padding:0 0 40px;}
+.lobby-container{max-width:900px;margin:0 auto;padding:20px;}
+.lobby-header-card{
+  background:linear-gradient(135deg,rgba(0,40,0,0.9),rgba(0,20,0,0.95));
+  border:2px solid var(--green);
+  border-radius:12px;
+  padding:24px;
+  text-align:center;
+  margin-bottom:20px;
+  box-shadow:0 0 30px var(--green-glow);
+}
+.team-name-display{font-family:'Orbitron',monospace;font-size:clamp(1.2rem,4vw,2rem);color:var(--green);text-shadow:0 0 15px var(--green);}
+.players-display{display:flex;gap:20px;justify-content:center;margin:12px 0;flex-wrap:wrap;}
+.player-badge{background:rgba(0,255,65,0.1);border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:0.9rem;}
+.status-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-family:'Orbitron',monospace;text-transform:uppercase;letter-spacing:1px;}
+.status-waiting{background:rgba(255,165,0,0.2);border:1px solid orange;color:orange;}
+.status-ready{background:rgba(0,255,65,0.2);border:1px solid var(--green);color:var(--green);}
+.status-playing{background:rgba(0,255,255,0.2);border:1px solid var(--cyan);color:var(--cyan);}
+.status-dq{background:rgba(255,0,64,0.2);border:1px solid var(--red);color:var(--red);}
+.status-timedout{background:rgba(128,0,0,0.2);border:1px solid #800;color:#f44;}
+
+.tabs{display:flex;gap:4px;margin-bottom:16px;}
+.tab-btn{flex:1;padding:10px;background:rgba(0,20,0,0.8);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;font-family:'Orbitron',monospace;font-size:0.7rem;transition:all 0.3s;border-radius:6px 6px 0 0;text-transform:uppercase;}
+.tab-btn.active{background:rgba(0,255,65,0.15);border-color:var(--green);color:var(--green);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* ===== GAME PAGE ===== */
+#game-page{padding:0;}
+.game-container{max-width:1100px;margin:0 auto;padding:20px;}
+
+.hud-bar{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:20px;
+}
+.hud-item{
+  background:rgba(0,20,0,0.9);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:12px;
+  text-align:center;
+}
+.hud-label{font-size:0.65rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.hud-value{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;color:var(--green);text-shadow:0 0 10px var(--green);}
+.hud-value.danger{color:var(--red);text-shadow:0 0 10px var(--red);animation:blink 0.5s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+.level-indicator{
+  display:flex;
+  gap:8px;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+}
+.level-dot{
+  flex:1;
+  min-width:80px;
+  padding:8px;
+  text-align:center;
+  border-radius:6px;
+  font-family:'Orbitron',monospace;
+  font-size:0.65rem;
+  border:1px solid var(--border);
+  background:rgba(0,10,0,0.8);
+  color:var(--text-dim);
+  text-transform:uppercase;
+}
+.level-dot.active{border-color:var(--green);color:var(--green);background:rgba(0,255,65,0.1);box-shadow:0 0 10px var(--green-glow);}
+.level-dot.completed{border-color:var(--gold);color:var(--gold);background:rgba(255,215,0,0.1);}
+.level-dot.locked{border-color:rgba(100,100,100,0.3);color:rgba(100,100,100,0.5);}
+
+/* Code editor */
+.code-section{margin-bottom:20px;}
+.code-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;}
+.code-label{font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--green);text-transform:uppercase;letter-spacing:2px;}
+.code-block{
+  background:#000f00;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:16px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.85rem;
+  line-height:1.6;
+  overflow-x:auto;
+  white-space:pre;
+  color:#c8ffc8;
+  position:relative;
+  user-select:none;
+}
+.code-line{display:flex;gap:12px;}
+.line-num{color:rgba(0,255,65,0.3);min-width:24px;text-align:right;user-select:none;}
+.line-code{color:#c8ffc8;}
+/* syntax colors — unified (no color distinction) */
+.syn-kw,.syn-fn,.syn-str,.syn-num,.syn-cmt,.syn-op,.syn-builtin{color:#c8ffc8;}
+
+.answer-editor{
+  width:100%;
+  background:#000f00;
+  border:2px solid var(--border);
+  border-radius:8px;
+  padding:14px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.9rem;
+  color:var(--green);
+  min-height:80px;
+  resize:vertical;
+  line-height:1.6;
+}
+.answer-editor:focus{border-color:var(--green);box-shadow:0 0 15px var(--green-glow);}
+
+/* Lives display */
+.lives-display{display:flex;gap:8px;align-items:center;}
+.life-icon{font-size:1.2rem;transition:all 0.3s;}
+.life-icon.lost{opacity:0.2;filter:grayscale(1);}
+
+/* Timer */
+.timer-display{
+  font-family:'Orbitron',monospace;
+  font-size:2rem;
+  font-weight:900;
+  color:var(--green);
+  text-shadow:0 0 20px var(--green);
+  text-align:center;
+}
+.timer-display.warning{color:var(--orange);text-shadow:0 0 20px var(--orange);}
+.timer-display.danger{color:var(--red);text-shadow:0 0 20px var(--red);animation:blink 0.5s infinite;}
+
+/* ===== ADMIN PANEL ===== */
+#admin-page{padding:0 0 40px;}
+.admin-container{max-width:1200px;margin:0 auto;padding:20px;}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:768px){.admin-grid{grid-template-columns:1fr;}}
+
+.event-controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
+
+.teams-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+.teams-table th{background:rgba(0,255,65,0.1);color:var(--green);font-family:'Orbitron',monospace;font-size:0.7rem;padding:10px 8px;text-align:left;border-bottom:1px solid var(--border);text-transform:uppercase;}
+.teams-table td{padding:8px;border-bottom:1px solid rgba(0,255,65,0.08);vertical-align:middle;}
+.teams-table tr:hover td{background:rgba(0,255,65,0.04);}
+
+/* ===== LEADERBOARD ===== */
+#leaderboard-page{padding:0 0 40px;}
+.lb-container{max-width:800px;margin:0 auto;padding:20px;}
+.lb-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 16px;
+  border-radius:8px;
+  margin-bottom:8px;
+  background:rgba(0,20,0,0.7);
+  border:1px solid var(--border);
+  transition:all 0.3s;
+  animation:slideIn 0.4s ease;
+}
+@keyframes slideIn{from{transform:translateX(-20px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+.lb-row:hover{border-color:var(--green);box-shadow:0 0 10px var(--green-glow);}
+.lb-row.rank-1{border-color:var(--gold);background:rgba(255,215,0,0.08);}
+.lb-row.rank-2{border-color:silver;background:rgba(192,192,192,0.05);}
+.lb-row.rank-3{border-color:#cd7f32;background:rgba(205,127,50,0.05);}
+.lb-row.dq{opacity:0.5;filter:grayscale(0.5);border-color:var(--red);}
+.lb-rank{font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;min-width:36px;color:var(--text-dim);}
+.lb-rank.rank-1{color:var(--gold);text-shadow:0 0 10px var(--gold);}
+.lb-rank.rank-2{color:silver;}
+.lb-rank.rank-3{color:#cd7f32;}
+.lb-team{flex:1;}
+.lb-team-name{font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:700;}
+.lb-players{font-size:0.75rem;color:var(--text-dim);}
+.lb-score{font-family:'Orbitron',monospace;font-size:1.2rem;color:var(--green);font-weight:900;}
+.lb-level{font-size:0.75rem;color:var(--text-dim);text-align:right;}
+
+/* ===== SPECTATOR PAGE ===== */
+#spectator-page{padding:0;background:var(--bg);min-height:100vh;}
+.spec-header{
+  background:linear-gradient(90deg,rgba(0,255,65,0.1),transparent,rgba(0,255,65,0.1));
+  border-bottom:2px solid var(--green);
+  padding:12px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.spec-title{font-family:'Orbitron',monospace;font-size:clamp(0.8rem,2vw,1.2rem);color:var(--green);text-shadow:0 0 10px var(--green);}
+.spec-body{padding:20px;}
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:900px){.spec-grid{grid-template-columns:1fr;}}
+
+/* Winner announcement */
+.winner-screen{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.95);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+  display:none;
+}
+.winner-screen.show{display:flex;}
+.winner-trophy{font-size:100px;animation:bounce 1s infinite;}
+@keyframes bounce{0%,100%{transform:scale(1);}50%{transform:scale(1.1) rotate(5deg);}}
+.winner-title{font-family:'Orbitron',monospace;font-size:clamp(1.5rem,5vw,3rem);color:var(--gold);text-shadow:0 0 40px var(--gold),0 0 80px var(--orange);text-align:center;margin:10px 0;}
+.winner-name{font-family:'Orbitron',monospace;font-size:clamp(1rem,3vw,1.8rem);color:var(--green);text-shadow:0 0 20px var(--green);}
+
+/* Confetti */
+.confetti-piece{
+  position:fixed;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  animation:confettiFall linear forwards;
+  z-index:1000;
+}
+@keyframes confettiFall{
+  0%{transform:translateY(-20px) rotate(0deg);opacity:1;}
+  100%{transform:translateY(110vh) rotate(720deg);opacity:0;}
+}
+
+/* ===== POPUP/MODAL ===== */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.85);
+  z-index:500;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+.overlay.show{display:flex;}
+.modal{
+  background:rgba(0,20,0,0.98);
+  border:2px solid var(--green);
+  border-radius:16px;
+  padding:44px 40px;
+  max-width:640px;
+  width:100%;
+  box-shadow:0 0 80px var(--green-glow);
+  text-align:center;
+  animation:modalIn 0.3s ease;
+}
+@keyframes modalIn{from{transform:scale(0.8);opacity:0;}to{transform:scale(1);opacity:1;}}
+.modal.danger-modal{border-color:var(--red);box-shadow:0 0 80px rgba(255,0,64,0.4);}
+.modal.gold-modal{border-color:var(--gold);box-shadow:0 0 80px rgba(255,215,0,0.4);}
+.modal-icon{font-size:4rem;margin-bottom:16px;}
+.modal-title{font-family:'Orbitron',monospace;font-size:1.4rem;color:var(--green);margin-bottom:14px;}
+.modal-danger .modal-title{color:var(--red);}
+.modal-msg{font-size:1rem;color:var(--text);margin-bottom:28px;line-height:1.7;}
+.modal-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+
+/* ===== ACTIVITY LOGS ===== */
+.log-list{max-height:300px;overflow-y:auto;font-family:'Share Tech Mono',monospace;font-size:0.75rem;}
+.log-entry{padding:6px 10px;border-bottom:1px solid rgba(0,255,65,0.08);display:flex;gap:8px;}
+.log-time{color:var(--text-dim);min-width:80px;}
+.log-action{color:var(--text);}
+.log-team{color:var(--cyan);}
+
+/* ===== ANNOUNCEMENTS ===== */
+.announcement-banner{
+  position:fixed;
+  top:0;left:0;right:0;
+  background:linear-gradient(90deg,var(--bg3),rgba(0,255,65,0.15),var(--bg3));
+  border-bottom:2px solid var(--green);
+  padding:12px 20px;
+  text-align:center;
+  z-index:200;
+  font-family:'Orbitron',monospace;
+  font-size:0.8rem;
+  color:var(--green);
+  transform:translateY(-100%);
+  transition:transform 0.5s;
+  display:none;
+}
+.announcement-banner.show{transform:translateY(0);display:block;}
+
+/* ===== HELP REQUEST ===== */
+.help-btn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:300;
+  background:rgba(0,20,0,0.95);
+  border:2px solid var(--orange);
+  color:var(--orange);
+  padding:12px 20px;
+  border-radius:50px;
+  cursor:pointer;
+  font-family:'Orbitron',monospace;
+  font-size:0.7rem;
+  box-shadow:0 0 20px rgba(255,102,0,0.3);
+  animation:helpPulse 2s infinite;
+  display:none;
+}
+.help-btn.visible{display:block;}
+@keyframes helpPulse{0%,100%{box-shadow:0 0 10px rgba(255,102,0,0.3);}50%{box-shadow:0 0 25px rgba(255,102,0,0.6);}}
+
+/* ===== RULES ===== */
+.rules-list{list-style:none;padding:0;}
+.rules-list li{padding:8px 0;border-bottom:1px solid rgba(0,255,65,0.1);display:flex;gap:10px;font-size:0.85rem;}
+.rules-list li::before{content:'▶';color:var(--green);flex-shrink:0;}
+.violation-badge{background:rgba(255,0,64,0.15);border:1px solid var(--red);border-radius:6px;padding:10px;margin-top:10px;font-size:0.8rem;color:var(--red);}
+
+/* ===== ADMIN SIDEBAR ===== */
+.admin-side-btn{
+  display:block;width:calc(100% - 24px);margin:0 12px;
+  padding:9px 14px;text-align:left;
+  background:transparent;border:1px solid transparent;
+  color:var(--text-dim);cursor:pointer;
+  font-family:'Orbitron',monospace;font-size:0.65rem;
+  border-radius:6px;transition:all 0.2s;letter-spacing:1px;text-transform:uppercase;
+}
+.admin-side-btn:hover{background:rgba(0,255,65,0.06);color:var(--text);}
+.admin-side-green{color:var(--green);border-color:rgba(0,255,65,0.2);}
+.admin-side-green:hover{background:rgba(0,255,65,0.1);border-color:var(--green);}
+.admin-side-orange{color:var(--orange);border-color:rgba(255,102,0,0.2);}
+.admin-side-orange:hover{background:rgba(255,102,0,0.1);border-color:var(--orange);}
+.admin-side-cyan{color:var(--cyan);border-color:rgba(0,255,255,0.2);}
+.admin-side-cyan:hover{background:rgba(0,255,255,0.1);border-color:var(--cyan);}
+.admin-side-red{color:var(--red);border-color:rgba(255,0,64,0.2);}
+.admin-side-red:hover{background:rgba(255,0,64,0.1);border-color:var(--red);}
+.admin-side-pink{color:#ff44aa;border-color:rgba(255,68,170,0.2);}
+.admin-side-pink:hover{background:rgba(255,68,170,0.1);border-color:#ff44aa;}
+.admin-nav-btn{
+  display:block;width:calc(100% - 24px);margin:0 12px;
+  padding:10px 14px;text-align:left;
+  background:transparent;border:1px solid transparent;
+  color:var(--text-dim);cursor:pointer;
+  font-family:'Orbitron',monospace;font-size:0.65rem;
+  border-radius:6px;transition:all 0.2s;letter-spacing:1px;
+}
+.admin-nav-btn:hover{background:rgba(0,255,65,0.06);color:var(--text);}
+.admin-nav-btn.active{background:rgba(0,255,65,0.12);border-color:var(--green);color:var(--green);}
+@media(max-width:768px){
+  #admin-sidebar{width:100%;height:auto;position:relative;top:0;flex-direction:row;flex-wrap:wrap;padding:10px;border-right:none;border-bottom:1px solid rgba(255,0,64,0.2);}
+  #admin-sidebar .admin-side-btn,#admin-sidebar .admin-nav-btn{width:auto;margin:2px;}
+}
+
+/* ===== SECRET LEVEL ===== */
+.secret-badge{
+  background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,102,0,0.15));
+  border:2px solid var(--gold);
+  border-radius:10px;
+  padding:16px;
+  text-align:center;
+  margin-bottom:20px;
+  animation:secretGlow 2s ease-in-out infinite;
+}
+@keyframes secretGlow{0%,100%{box-shadow:0 0 15px rgba(255,215,0,0.2);}50%{box-shadow:0 0 40px rgba(255,215,0,0.5),0 0 80px rgba(255,102,0,0.2);}}
+.secret-title{font-family:'Orbitron',monospace;font-size:1rem;color:var(--gold);text-shadow:0 0 10px var(--gold);}
+
+/* ===== MISC ===== */
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:16px 0;}
+.text-green{color:var(--green);}
+.text-red{color:var(--red);}
+.text-gold{color:var(--gold);}
+.text-cyan{color:var(--cyan);}
+.text-dim{color:var(--text-dim);}
+.mt-10{margin-top:10px;}
+.mt-20{margin-top:20px;}
+.mb-10{margin-bottom:10px;}
+.flex{display:flex;}
+.flex-wrap{flex-wrap:wrap;}
+.gap-10{gap:10px;}
+.align-center{align-items:center;}
+.justify-between{justify-content:space-between;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:600px){.grid-2{grid-template-columns:1fr;}.hud-bar{grid-template-columns:1fr 1fr;}}
+
+/* Glitch text */
+.glitch{position:relative;}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;top:0;left:0;opacity:0.8;}
+.glitch::before{color:var(--red);clip-path:polygon(0 0,100% 0,100% 45%,0 45%);animation:glitch1 3s infinite;}
+.glitch::after{color:var(--cyan);clip-path:polygon(0 55%,100% 55%,100% 100%,0 100%);animation:glitch2 3s infinite;}
+@keyframes glitch1{0%,90%,100%{transform:translateX(0);}95%{transform:translateX(-3px);}}
+@keyframes glitch2{0%,90%,100%{transform:translateX(0);}95%{transform:translateX(3px);}}
+
+
+/* ===== SINGLE PAGE TOP NAV ===== */
+#top-nav{
+  position:fixed;top:0;left:0;right:0;
+  background:rgba(0,5,0,0.97);
+  border-bottom:1px solid var(--border);
+  z-index:100;
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 16px;
+  height:48px;
+  gap:8px;
+  backdrop-filter:blur(8px);
+}
+#top-nav.visible{display:flex;}
+.nav-logo{font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--green);white-space:nowrap;text-shadow:0 0 8px var(--green);}
+.nav-links{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;}
+.nav-links::-webkit-scrollbar{display:none;}
+.nav-btn{
+  background:transparent;
+  border:1px solid transparent;
+  color:var(--text-dim);
+  padding:5px 10px;
+  border-radius:4px;
+  cursor:pointer;
+  font-family:'Orbitron',monospace;
+  font-size:0.6rem;
+  white-space:nowrap;
+  transition:all 0.2s;
+  text-transform:uppercase;
+}
+.nav-btn:hover,.nav-btn.active{border-color:var(--green);color:var(--green);background:rgba(0,255,65,0.08);}
+.nav-btn.nav-admin{color:var(--red);}
+.nav-btn.nav-admin:hover,.nav-btn.nav-admin.active{border-color:var(--red);color:var(--red);background:rgba(255,0,64,0.08);}
+/* Push content below nav */
+body.nav-visible .section.active{padding-top:56px;}
+
+
+/* ===== SINGLE PAGE PANEL TRANSITIONS ===== */
+#landing-wrapper{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:60px 20px 20px;
+  position:relative;
+}
+
+/* The 3D card animates out */
+#main-card{
+  transition:transform 0.55s cubic-bezier(0.4,0,0.2,1), opacity 0.45s ease;
+  transform-origin:center center;
+}
+#main-card.fly-out-left{
+  transform:translateX(-120%) rotateY(-40deg) scale(0.7);
+  opacity:0;
+  pointer-events:none;
+}
+#main-card.fly-out-right{
+  transform:translateX(120%) rotateY(40deg) scale(0.7);
+  opacity:0;
+  pointer-events:none;
+}
+#main-card.fly-out-up{
+  transform:translateY(-120%) rotateX(30deg) scale(0.7);
+  opacity:0;
+  pointer-events:none;
+}
+#main-card.fly-out-down{
+  transform:translateY(120%) rotateX(-30deg) scale(0.7);
+  opacity:0;
+  pointer-events:none;
+}
+
+/* Panels slide in over the landing page */
+.landing-panel{
+  position:absolute;
+  inset:0;
+  min-height:100vh;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:70px 20px 40px;
+  opacity:0;
+  pointer-events:none;
+  transform:translateX(60px);
+  transition:opacity 0.4s ease 0.25s, transform 0.4s ease 0.25s;
+  overflow-y:auto;
+}
+.landing-panel.panel-in{
+  opacity:1;
+  pointer-events:auto;
+  transform:translateX(0);
+}
+.landing-panel.panel-from-right{
+  transform:translateX(60px);
+}
+.landing-panel.panel-from-left{
+  transform:translateX(-60px);
+}
+.landing-panel.panel-from-bottom{
+  transform:translateY(60px);
+}
+.panel-inner{
+  width:100%;
+  max-width:520px;
+}
+.panel-back-btn{
+  display:flex;align-items:center;gap:8px;
+  background:transparent;
+  border:1px solid rgba(0,255,65,0.3);
+  color:var(--green);
+  padding:8px 16px;
+  border-radius:6px;
+  cursor:pointer;
+  font-family:'Orbitron',monospace;
+  font-size:0.65rem;
+  margin-bottom:20px;
+  transition:all 0.3s;
+  letter-spacing:1px;
+}
+.panel-back-btn:hover{
+  border-color:var(--green);
+  box-shadow:0 0 10px var(--green-glow);
+  transform:translateX(-3px);
+}
+
+
+@keyframes spinGlow{0%,100%{filter:drop-shadow(0 0 10px var(--green));}50%{filter:drop-shadow(0 0 25px var(--green)) drop-shadow(0 0 50px var(--cyan));}}
+@keyframes ctaPulse{
+  0%,100%{box-shadow:0 0 20px rgba(0,255,65,0.3),inset 0 0 20px rgba(0,255,65,0.05);}
+  50%{box-shadow:0 0 40px rgba(0,255,65,0.6),inset 0 0 30px rgba(0,255,65,0.1);}
+}
+#enter-arena-btn:hover{
+  background:rgba(0,255,65,0.1)!important;
+  transform:translateY(-2px);
+  box-shadow:0 0 50px rgba(0,255,65,0.7),inset 0 0 30px rgba(0,255,65,0.1)!important;
+}
+
+
+/* ===== ARENA SPLIT LAYOUT ===== */
+.arena-split{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  min-height:400px;
+}
+@media(max-width:768px){
+  .arena-split{grid-template-columns:1fr;}
+}
+.arena-col{
+  display:flex;
+  flex-direction:column;
+  background:rgba(0,10,0,0.7);
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+}
+.arena-left{border-color:rgba(255,0,64,0.3);}
+.arena-right{border-color:rgba(0,255,65,0.3);}
+.arena-col-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px 14px;
+  background:rgba(0,0,0,0.4);
+  border-bottom:1px solid var(--border);
+  font-family:'Orbitron',monospace;
+  font-size:0.72rem;
+  font-weight:700;
+  letter-spacing:1px;
+  flex-shrink:0;
+}
+.arena-col .code-block{
+  border:none;
+  border-radius:0;
+  background:transparent;
+  padding:14px;
+  flex:1;
+  font-size:0.82rem;
+  overflow-x:auto;
+  overflow-y:auto;
+  max-height:320px;
+}
+.arena-right .answer-editor{
+  border-radius:0;
+  border:none;
+  border-top:1px solid rgba(0,255,65,0.15);
+  background:rgba(0,5,0,0.6);
+  padding:14px;
+  font-size:0.88rem;
+  resize:vertical;
+  pointer-events:auto;
+  user-select:text;
+  -webkit-user-select:text;
+  cursor:text;
+  position:relative;
+  z-index:5;
+}
+.arena-right .answer-editor:focus{
+  box-shadow:inset 0 0 20px rgba(0,255,65,0.05);
+}
+.arena-right > div{padding:14px;}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--green-dim);border-radius:3px;}
+
+/* Progress bar */
+.progress-bar{height:6px;background:rgba(0,255,65,0.1);border-radius:3px;overflow:hidden;margin-top:4px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--green-dim),var(--green));border-radius:3px;transition:width 0.5s;}
+
+/* Toast — centered top */
+#toast-container{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;align-items:center;gap:8px;width:auto;max-width:90vw;pointer-events:none;}
+.toast{
+  background:rgba(0,30,0,0.97);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:12px 24px;
+  font-size:0.88rem;
+  text-align:center;
+  white-space:nowrap;
+  animation:toastIn 0.3s ease,toastOut 0.4s ease 6.6s forwards;
+  pointer-events:none;
+}
+.toast.success{border-color:var(--green);color:var(--green);}
+.toast.error{border-color:var(--red);color:var(--red);font-family:'Orbitron',monospace;font-size:0.82rem;letter-spacing:1px;}
+.toast.warn{border-color:var(--orange);color:var(--orange);}
+.toast.info{border-color:var(--cyan);color:var(--cyan);}
+@keyframes toastIn{from{transform:translateY(-20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+@keyframes toastOut{to{transform:translateY(-20px);opacity:0;}}
+
+/* Loading screen */
+#loading-screen{position:fixed;inset:0;background:var(--bg);z-index:900;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;}
+.loading-text{font-family:'Orbitron',monospace;font-size:1rem;color:var(--green);letter-spacing:3px;}
+.loading-bar{width:200px;height:3px;background:rgba(0,255,65,0.1);border-radius:2px;overflow:hidden;}
+.loading-fill{height:100%;background:var(--green);animation:loadAnim 1.8s ease-in-out infinite;}
+@keyframes loadAnim{0%{width:0%;margin-left:0;}50%{width:60%;margin-left:20%;}100%{width:0%;margin-left:100%;}}
+
+/* Help requests list */
+.help-req-item{display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid rgba(255,102,0,0.3);border-radius:6px;margin-bottom:8px;background:rgba(255,102,0,0.05);}
+.help-req-info{font-size:0.8rem;}
+.help-req-team{color:var(--orange);font-weight:700;}
+
+/* Admin login overlay */
+#admin-login-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:600;display:none;align-items:center;justify-content:center;}
+#admin-login-overlay.show{display:flex;}
+.admin-login-card{background:rgba(0,20,0,0.98);border:2px solid var(--red);border-radius:12px;padding:30px;max-width:380px;width:100%;box-shadow:0 0 40px rgba(255,0,64,0.3);}
+
+/* Announcement list */
+.announcement-item{background:rgba(0,255,65,0.05);border:1px solid var(--border);border-radius:6px;padding:10px;margin-bottom:8px;font-size:0.82rem;}
+
+/* Override panel */
+.override-item{border:1px solid rgba(255,165,0,0.3);border-radius:8px;padding:12px;margin-bottom:10px;background:rgba(255,165,0,0.05);}
+.override-item .sub-code{font-family:'Share Tech Mono',monospace;font-size:0.78rem;background:rgba(0,0,0,0.5);padding:8px;border-radius:4px;margin:8px 0;white-space:pre-wrap;word-break:break-all;}
+
+/* Spec ticker */
+.score-ticker{overflow:hidden;white-space:nowrap;background:rgba(0,255,65,0.05);border-top:1px solid var(--border);padding:8px 0;}
+.ticker-inner{display:inline-block;animation:tickerScroll 20s linear infinite;padding-left:100%;}
+@keyframes tickerScroll{0%{transform:translateX(0);}100%{transform:translateX(-100%);}}</style>
+</head>
+<body>
+<canvas id="matrix-bg"></canvas>
+<div class="scanlines"></div>
+
+<!-- TOP NAVIGATION BAR (visible after landing) -->
+<nav id="top-nav">
+  <div class="nav-logo">⚡ JARFIX 2K26</div>
+  <div style="flex:1"></div>
+  <button class="nav-btn nav-admin" id="nav-admin" onclick="openAdminLogin()" style="margin-left:auto;">🔐 ADMIN</button>
+</nav>
+
+<!-- Loading Screen -->
+<div id="loading-screen">
+  <div style="font-size:48px;animation:spinGlow 2s ease-in-out infinite;">⚡</div>
+  <div class="loading-text" id="loading-text">CONNECTING...</div>
+  <div class="loading-bar"><div class="loading-fill"></div></div>
+  <div style="font-size:0.7rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace;margin-top:8px;letter-spacing:2px;">NEXUS TECH 2K26 — JARFIX</div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<!-- Help Button -->
+<button class="help-btn" id="help-btn" onclick="requestHelp()">🆘 NEED HELP</button>
+
+<!-- Announcement Banner -->
+<div class="announcement-banner" id="announcement-banner"></div>
+
+<!-- Admin Login Overlay -->
+<div id="admin-login-overlay">
+  <div class="admin-login-card">
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="font-size:2rem">🔐</div>
+      <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--red);margin-top:8px;">ADMIN ACCESS</div>
+      <div style="font-size:0.8rem;color:var(--text-dim);margin-top:4px;">Enter command password</div>
+    </div>
+    <div class="form-group">
+      <input type="password" id="admin-pw-input" placeholder="Enter password..." onkeydown="if(event.key==='Enter')checkAdminLogin()">
+    </div>
+    <div id="admin-pw-error" style="color:var(--red);font-size:0.8rem;margin-bottom:10px;display:none;">❌ Wrong password. Try again.</div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-red btn-full" onclick="checkAdminLogin()">ACCESS GRANTED</button>
+      <button class="btn btn-full" style="color:var(--text-dim);border-color:var(--text-dim);" onclick="closeAdminLogin()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- POPUP MODAL -->
+<div class="overlay" id="modal-overlay">
+  <div class="modal" id="modal-box">
+    <div class="modal-icon" id="modal-icon">⚠️</div>
+    <div class="modal-title" id="modal-title">Alert</div>
+    <div class="modal-msg" id="modal-msg"></div>
+    <div class="modal-btns" id="modal-btns">
+      <button class="btn btn-green" onclick="closeModal()">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Winner Screen -->
+<div class="winner-screen" id="winner-screen">
+<!-- END-EVENT LEADERBOARD FULLSCREEN OVERLAY -->
+<div id="final-lb-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:998;overflow-y:auto;padding:20px;">
+  <div style="max-width:700px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:24px;padding-top:20px;">
+      <div style="font-size:3rem;margin-bottom:8px;">🏆</div>
+      <div style="font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;color:var(--gold);text-shadow:0 0 30px var(--gold);">TIME'S UP!</div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--text-dim);margin-top:6px;">FINAL LEADERBOARD</div>
+    </div>
+    <div id="final-lb-rows" style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;"></div>
+    <div style="text-align:center;">
+      <button class="btn btn-green" onclick="document.getElementById('final-lb-overlay').style.display='none'" style="font-size:0.8rem;">✓ CLOSE</button>
+    </div>
+  </div>
+</div>
+  <div class="winner-trophy">🏆</div>
+  <div class="winner-title" style="font-family:'Orbitron',monospace;color:var(--gold)">ULTIMATE DEBUGGER</div>
+  <div class="winner-name" id="winner-name"></div>
+  <div style="color:var(--text-dim);margin:10px 0;font-size:0.9rem" id="winner-players"></div>
+  <div style="font-family:'Orbitron',monospace;font-size:1.5rem;color:var(--green);margin:10px 0" id="winner-score"></div>
+  <button class="btn btn-gold mt-20" onclick="closeWinnerScreen()">CLOSE</button>
+</div>
+
+<!-- Config page removed — Firebase hardcoded -->
+<div class="section" id="config-page"></div>
+
+<!-- ==================== LANDING + ALL PANELS ==================== -->
+<div class="section" id="landing">
+  <div id="landing-wrapper">
+    <!-- 3D TILT CARD -->
+    <div class="card-3d-scene" id="main-card" style="height:580px;">
+
+      <!-- Hover zones 3x3 grid -->
+      <div class="card-3d-grid">
+        <div></div><div></div><div></div>
+        <div></div><div></div><div></div>
+        <div></div><div></div><div></div>
+      </div>
+
+      <!-- 3D inner -->
+      <div class="card-3d-inner">
+        <div class="card-3d-body">
+
+          <!-- Spinning border -->
+          <div class="card-3d-border-spin">
+            <div class="card-3d-border-inner"></div>
+          </div>
+
+          <!-- Main content -->
+          <div class="card-3d-content">
+            <div class="card-3d-shimmer"></div>
+            <div class="card-bg-circuit"></div>
+
+            <!-- FACE A: Event info + CTA (shown by default) -->
+            <div id="card-face-a" style="position:relative;height:100%;padding:28px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+
+              <!-- Top badge -->
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;filter:drop-shadow(0 0 10px rgba(0,255,65,0.8));">
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                  <defs><linearGradient id="gem2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00ff41"/><stop offset="100%" stop-color="#00cc33"/></linearGradient></defs>
+                  <path d="M12 2L3 9L12 22L21 9L12 2Z" fill="url(#gem2)"/>
+                  <path d="M12 2L3 9H21L12 2Z" fill="white" opacity="0.4"/>
+                </svg>
+                <span style="font-size:9px;font-weight:700;letter-spacing:5px;background:linear-gradient(90deg,#00ff41,#00ffff,#00ff41);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-family:'Orbitron',monospace;">NEXUS TECH</span>
+              </div>
+
+              <!-- Event name glitch -->
+              <div class="landing-title glitch" data-text="NEXUS TECH 2K26" style="font-size:clamp(1.4rem,5vw,2rem);margin-bottom:4px;">NEXUS TECH 2K26</div>
+              <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--cyan);letter-spacing:3px;text-shadow:0 0 10px var(--cyan);margin-bottom:20px;">JARFIX — PYTHON DEBUGGING</div>
+
+              <!-- Art area -->
+              <div style="position:relative;width:100%;height:150px;border-radius:12px;overflow:hidden;border:1px solid rgba(0,255,65,0.2);margin-bottom:20px;box-shadow:inset 0 0 30px rgba(0,0,0,0.9);">
+                <div style="position:absolute;inset:0;background:linear-gradient(160deg,#000e00,#001505,#000500);"></div>
+                <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 40% 50%,rgba(0,255,65,0.18) 0%,transparent 60%);"></div>
+                <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 340 150">
+                  <defs>
+                    <radialGradient id="codeGlow" cx="50%" cy="50%" r="45%">
+                      <stop offset="0%" stop-color="#00ff41" stop-opacity="0.4"/>
+                      <stop offset="100%" stop-color="#000500" stop-opacity="0"/>
+                    </radialGradient>
+                    <filter id="glow2"><feGaussianBlur stdDeviation="2.5"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                  </defs>
+                  <ellipse cx="170" cy="75" rx="100" ry="55" fill="url(#codeGlow)" opacity="0.8"/>
+                  <rect x="60" y="25" width="120" height="7" rx="3" fill="#00ff41" opacity="0.55" filter="url(#glow2)"/>
+                  <rect x="70" y="40" width="90" height="7" rx="3" fill="#00cc33" opacity="0.4"/>
+                  <rect x="80" y="55" width="130" height="7" rx="3" fill="#ff0040" opacity="0.75" filter="url(#glow2)"/>
+                  <text x="218" y="63" fill="#ff0040" font-size="11" font-family="monospace" filter="url(#glow2)" opacity="0.9">← BUG</text>
+                  <rect x="70" y="70" width="100" height="7" rx="3" fill="#00ff41" opacity="0.45"/>
+                  <rect x="60" y="85" width="80" height="7" rx="3" fill="#00ffff" opacity="0.35" filter="url(#glow2)"/>
+                  <rect x="75" y="100" width="110" height="7" rx="3" fill="#00ff41" opacity="0.5"/>
+                  <circle cx="35" cy="45" r="3" fill="#00ffff" opacity="0.8">
+                    <animateTransform attributeName="transform" type="rotate" from="0 170 75" to="360 170 75" dur="7s" repeatCount="indefinite"/>
+                  </circle>
+                  <circle cx="305" cy="105" r="2" fill="#00ff41" opacity="0.7">
+                    <animateTransform attributeName="transform" type="rotate" from="180 170 75" to="540 170 75" dur="5s" repeatCount="indefinite"/>
+                  </circle>
+                  <rect x="185" y="115" width="9" height="11" rx="1" fill="#00ff41">
+                    <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+                  </rect>
+                </svg>
+                <div style="position:absolute;top:14%;left:10%;width:4px;height:4px;border-radius:50%;background:#00ff41;animation:bounce 2s infinite;filter:drop-shadow(0 0 4px #00ff41);"></div>
+                <div style="position:absolute;bottom:20%;right:8%;width:3px;height:3px;border-radius:50%;background:#00ffff;animation:bounce 2.6s infinite 0.4s;filter:drop-shadow(0 0 4px #00ffff);"></div>
+              </div>
+
+              <!-- Dialogue -->
+              <div style="background:rgba(0,255,65,0.04);border:1px solid rgba(0,255,65,0.12);border-radius:10px;padding:14px 16px;margin-bottom:22px;width:100%;">
+                <p id="card-dialogue" style="font-size:12px;color:rgba(0,255,65,0.85);line-height:1.7;font-style:italic;font-family:'Share Tech Mono',monospace;min-height:40px;"></p>
+                <p style="font-size:10px;color:rgba(0,255,65,0.35);margin-top:8px;font-family:'Orbitron',monospace;letter-spacing:2px;">WELCOME TO NEXUS TECH JARFIX</p>
+              </div>
+
+              <!-- CTA button -->
+              <button id="enter-arena-btn" onclick="enterArena()" style="
+                font-family:'Orbitron',monospace;font-size:0.75rem;font-weight:700;
+                padding:14px 32px;border:2px solid var(--green);border-radius:8px;
+                background:transparent;color:var(--green);cursor:pointer;
+                letter-spacing:3px;text-transform:uppercase;
+                box-shadow:0 0 20px rgba(0,255,65,0.3),inset 0 0 20px rgba(0,255,65,0.05);
+                transition:all 0.3s;animation:ctaPulse 2s ease-in-out infinite;
+                width:100%;
+              ">⚡ CLICK TO ENTER THE ARENA</button>
+
+            </div>
+
+            <!-- FACE B: Register + Admin (hidden until CTA clicked) -->
+            <div id="card-face-b" style="position:absolute;inset:0;padding:28px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;opacity:0;pointer-events:none;transform:scale(0.9);transition:opacity 0.4s ease,transform 0.4s ease;">
+
+              <div style="font-family:'Orbitron',monospace;font-size:0.7rem;color:var(--text-dim);letter-spacing:3px;margin-bottom:6px;">CHOOSE YOUR ROLE</div>
+              <div style="font-family:'Orbitron',monospace;font-size:1.1rem;color:var(--green);text-shadow:0 0 15px var(--green);margin-bottom:4px;">ENTER THE ARENA</div>
+              <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:30px;font-family:'Share Tech Mono',monospace;">Who are you in this battle?</div>
+
+              <!-- Big Register button -->
+              <button onclick="openPanel('panel-register','left')" style="
+                width:100%;padding:18px;margin-bottom:14px;
+                font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;
+                background:linear-gradient(135deg,rgba(0,255,65,0.12),rgba(0,200,50,0.08));
+                border:2px solid var(--green);border-radius:10px;
+                color:var(--green);cursor:pointer;letter-spacing:2px;
+                text-shadow:0 0 10px var(--green);
+                box-shadow:0 0 20px rgba(0,255,65,0.2);
+                transition:all 0.3s;
+              ">
+                <div style="font-size:1.8rem;margin-bottom:6px;">⚡</div>
+                TEAM REGISTER
+                <div style="font-size:10px;color:rgba(0,255,65,0.5);margin-top:4px;letter-spacing:1px;">Join the debugging battle</div>
+              </button>
+
+              <!-- Big Admin button -->
+              <button onclick="openAdminLogin()" style="
+                width:100%;padding:18px;margin-bottom:20px;
+                font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;
+                background:linear-gradient(135deg,rgba(255,0,64,0.1),rgba(200,0,40,0.06));
+                border:2px solid var(--red);border-radius:10px;
+                color:var(--red);cursor:pointer;letter-spacing:2px;
+                text-shadow:0 0 10px var(--red);
+                box-shadow:0 0 20px rgba(255,0,64,0.15);
+                transition:all 0.3s;
+              ">
+                <div style="font-size:1.8rem;margin-bottom:6px;">🔐</div>
+                ADMIN LOGIN
+                <div style="font-size:10px;color:rgba(255,0,64,0.5);margin-top:4px;letter-spacing:1px;">Command center access</div>
+              </button>
+
+              <!-- Back link -->
+              <button onclick="exitArena()" style="background:transparent;border:none;color:var(--text-dim);font-size:0.75rem;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:1px;text-decoration:underline;padding:4px;">
+                ← BACK
+              </button>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PANEL: REGISTER ===== -->
+    <div class="landing-panel panel-from-left" id="panel-register">
+      <div class="panel-inner">
+        <button class="panel-back-btn" onclick="closePanel('panel-register')">◀ BACK TO ARENA</button>
+        <div class="card">
+          <div class="card-title">⚡ Register Your Team</div>
+          <div class="form-group">
+            <label>Team Name</label>
+            <input type="text" id="reg-team" placeholder="Enter team name..." maxlength="30">
+          </div>
+          <div class="form-group">
+            <label>Player 1 Name</label>
+            <input type="text" id="reg-p1" placeholder="Enter player 1 name..." maxlength="30">
+          </div>
+          <div class="form-group">
+            <label>Player 2 Name</label>
+            <input type="text" id="reg-p2" placeholder="Enter player 2 name..." maxlength="30">
+          </div>
+          <button class="btn btn-green btn-full" onclick="registerTeam()">⚡ JOIN THE ARENA</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PANEL: LEADERBOARD ===== -->
+    <div class="landing-panel panel-from-right" id="panel-leaderboard">
+      <div class="panel-inner" style="max-width:700px;">
+        <button class="panel-back-btn" onclick="closePanel('panel-leaderboard')">◀ BACK TO ARENA</button>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--green);">📊 LIVE LEADERBOARD</div>
+          <div style="font-size:0.7rem;color:var(--text-dim)" id="lb-last-update">Updating...</div>
+        </div>
+        <div id="leaderboard-rows">
+          <div style="text-align:center;padding:40px;color:var(--text-dim);">Loading teams...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PANEL: SPECTATOR ===== -->
+    <div class="landing-panel panel-from-bottom" id="panel-spectator">
+      <div class="panel-inner" style="max-width:1100px;">
+        <button class="panel-back-btn" onclick="closePanel('panel-spectator')">◀ BACK TO ARENA</button>
+        <div class="spec-header" style="position:static;border-radius:10px;margin-bottom:16px;">
+          <div>
+            <div class="spec-title">⚡ NEXUS TECH 2K26 — JARFIX LIVE</div>
+            <div style="font-size:0.7rem;color:var(--text-dim)">SPECTATOR MODE</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-green btn-sm" onclick="specView='lb';renderSpec()">LEADERBOARD</button>
+            <button class="btn btn-cyan btn-sm" onclick="specView='progress';renderSpec()">PROGRESS</button>
+            <button class="btn btn-gold btn-sm" onclick="specView='spotlight';renderSpec()">SPOTLIGHT</button>
+          </div>
+        </div>
+        <div style="text-align:center;padding:10px;background:rgba(0,20,0,0.6);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;">
+          <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:2px;font-family:'Orbitron',monospace;">GLOBAL TIMER</div>
+          <div class="timer-display" id="spec-timer">--:--</div>
+        </div>
+        <div id="spec-content"></div>
+        <div class="score-ticker" style="margin-top:16px;border-radius:8px;">
+          <div class="ticker-inner" id="score-ticker">Loading scores...</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end landing-wrapper -->
+</div>
+
+<!-- ==================== PAGE: LOBBY ==================== -->
+<div class="section" id="lobby-page" style="display:none;">
+  <div class="page-header">
+    <h1>🏟️ WAITING ARENA</h1>
+    <div id="lobby-status-badge"></div>
+  </div>
+  <div class="lobby-container">
+    <div class="lobby-header-card" id="lobby-team-card">
+      <div class="team-name-display" id="lobby-team-name">TEAM NAME</div>
+      <div class="players-display">
+        <div class="player-badge">⚡ <span id="lobby-p1">Player 1</span></div>
+        <div class="player-badge">⚡ <span id="lobby-p2">Player 2</span></div>
+      </div>
+      <div id="lobby-status-display" class="status-badge status-waiting">WAITING</div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this,'lobby-tab')">🏟️ LOBBY</button>
+      <button class="tab-btn" onclick="switchTab(this,'rules-tab')">📋 RULES</button>
+      <button class="tab-btn" onclick="switchTab(this,'lb-tab');loadLeaderboard()">🏆 LEADERBOARD</button>
+    </div>
+
+    <div class="tab-content active" id="lobby-tab">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+          <div>
+            <div style="font-size:0.8rem;color:var(--text-dim)">Event starts when admin signals. Mark ready!</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-green btn-sm" id="ready-btn" onclick="setReady()">✅ MARK READY</button>
+            <button class="btn btn-orange btn-sm" id="unready-btn" onclick="setUnready()" style="display:none;">❌ MARK UNREADY</button>
+          </div>
+        </div>
+        <div id="event-waiting-msg" style="text-align:center;padding:20px;color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.8rem;">
+          ⏳ WAITING FOR ADMIN TO START THE EVENT...
+        </div>
+        <div id="event-started-msg" style="display:none;text-align:center;padding:20px;">
+          <div style="color:var(--green);font-family:'Orbitron',monospace;font-size:1rem;text-shadow:0 0 10px var(--green);">🚀 EVENT STARTED!</div>
+          <button class="btn btn-green btn-full mt-10" onclick="enterGamePage()">ENTER THE ARENA →</button>
+        </div>
+      </div>
+      <div class="card mt-20">
+        <div class="card-title">📋 Competition Rules</div>
+        <ul class="rules-list">
+          <li>Do not switch browser tabs during competition</li>
+          <li>Do not open browser developer tools</li>
+          <li>Do not copy or paste code in the answer field</li>
+          <li>Sample output can only be revealed 2 times per level</li>
+          <li>The full buggy code is pre-loaded on the right side — find the red highlighted error on the left and edit only that line, then submit the full code</li>
+          <li>Either player on the team may submit answers</li>
+          <li>When a level timer expires, you have a 10-second grace period to submit if an answer is already typed</li>
+          <li>Correct fix = base points. Wrong = -1 life. 0 lives = Game Over</li>
+        </ul>
+        <div class="violation-badge">
+          ⚠️ First violation: Warning + 5 points deducted<br>
+          💀 Second violation: Team disqualified from competition
+        </div>
+        <div style="margin-top:12px;background:rgba(0,255,65,0.05);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:0.82rem;">
+          <div style="color:var(--gold);font-family:'Orbitron',monospace;font-size:0.75rem;margin-bottom:8px;">SCORING</div>
+          Level 1: 100pts | Level 2: 200pts | Level 3: 300pts<br>
+          1st finish bonus: +50pts | 2nd: +25pts | 3rd: +10pts<br>
+          Secret Level: Bonus tiebreaker — earns ULTIMATE DEBUGGER title
+        </div>
+      </div>
+      <div class="card mt-20">
+        <div class="card-title">Teams in Arena</div>
+        <div id="lobby-teams-list" style="max-height:250px;overflow-y:auto;"></div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="rules-tab">
+      <div class="card">
+        <div class="card-title">Competition Rules & Penalties</div>
+        <ul class="rules-list">
+          <li>Do not switch browser tabs during competition</li>
+          <li>Do not open browser developer tools</li>
+          <li>Do not refresh the page more than 3 times — 4th refresh = disqualification</li>
+          <li>Do not copy or paste code in the answer field</li>
+          <li>Sample output can only be revealed 2 times per level</li>
+          <li>The full buggy code is pre-loaded on the right side — find the red highlighted error on the left and edit only that line, then submit the full code</li>
+          <li>Either player on the team may submit answers</li>
+          <li>When a level timer expires, you have a 10-second grace period to submit if an answer is already typed</li>
+          <li>Correct fix = base points. Wrong = -1 life. 0 lives = Game Over</li>
+        </ul>
+        <div class="violation-badge">
+          ⚠️ First violation: Warning + 5 points deducted<br>
+          💀 Second violation: Team disqualified from competition
+        </div>
+        <div style="margin-top:16px;background:rgba(0,255,65,0.05);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:0.82rem;">
+          <div style="color:var(--gold);font-family:'Orbitron',monospace;font-size:0.75rem;margin-bottom:8px;">SCORING</div>
+          Level 1: 100pts | Level 2: 200pts | Level 3: 300pts<br>
+          1st finish bonus: +50pts | 2nd: +25pts | 3rd: +10pts<br>
+          Secret Level: Bonus tiebreaker — earns ULTIMATE DEBUGGER title
+        </div>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD TAB -->
+    <div class="tab-content" id="lb-tab">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--green);">🏆 LIVE LEADERBOARD</div>
+        <div style="font-size:0.7rem;color:var(--text-dim)" id="lb-last-update">Updating...</div>
+      </div>
+      <div id="leaderboard-rows">
+        <div style="text-align:center;padding:40px;color:var(--text-dim);">Loading teams...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE: GAME ==================== -->
+<div class="section" id="game-page" style="display:none;">
+  <div class="page-header">
+    <h1>⚡ JARFIX ARENA</h1>
+    <div id="game-team-name-display" style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--cyan);"></div>
+    <div id="game-status-badge"></div>
+  </div>
+  <div class="game-container">
+    <!-- HUD -->
+    <div class="hud-bar">
+      <div class="hud-item">
+        <div class="hud-label">🐛 Bugs Fixed</div>
+        <div class="hud-value" id="hud-bugs">0</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">❤️ Lives</div>
+        <div class="hud-value" id="hud-lives">2</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">⏱ Time Left</div>
+        <div class="timer-display" id="hud-timer">01:00</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">🏆 Rank</div>
+        <div class="hud-value" id="hud-rank">#-</div>
+      </div>
+    </div>
+
+    <!-- Level indicators -->
+    <div class="level-indicator" id="level-indicator">
+      <div class="level-dot active" id="ldot-1">LVL 1</div>
+      <div class="level-dot locked" id="ldot-2">LVL 2</div>
+      <div class="level-dot locked" id="ldot-3">LVL 3</div>
+      <div class="level-dot locked" id="ldot-s">SECRET</div>
+    </div>
+
+    <!-- SCORE display -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+      <div style="font-family:'Orbitron',monospace;">SCORE: <span id="game-score" style="color:var(--green);text-shadow:0 0 10px var(--green);">0</span></div>
+      <div id="lives-icons"></div>
+    </div>
+
+    <!-- Level sections -->
+    <div id="level-sections">
+      <!-- Level 1 -->
+      <div id="level-section-1" class="level-section">
+        <div class="secret-badge" style="background:rgba(0,255,65,0.06);border-color:var(--green);margin-bottom:10px;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--green);">LEVEL 1 — INITIATION</div>
+          <div style="font-size:0.75rem;color:var(--text-dim);margin-top:3px;">100 Points + Finish Bonus</div>
+        </div>
+        <div id="desc-1" style="font-size:0.85rem;line-height:1.6;color:var(--text);background:rgba(0,20,0,0.6);padding:10px 14px;border-radius:6px;border-left:3px solid var(--green);margin-bottom:12px;"></div>
+        <div class="arena-split">
+          <div class="arena-col arena-left">
+            <div class="arena-col-header"><span style="color:var(--red);">🐛 BUGGY CODE</span><span style="font-size:0.62rem;color:var(--text-dim);">READ ONLY • ERRORS HIGHLIGHTED</span></div>
+            <div class="code-block" id="code-display-1" style="flex:1;max-height:none;min-height:240px;"></div>
+            <div style="padding:10px 14px;border-top:1px solid rgba(0,255,65,0.1);">
+              <button class="btn btn-cyan btn-sm btn-full" onclick="revealSample(1)">👁 REVEAL SAMPLE OUTPUT <span id="sample-count-1">(0/2)</span></button>
+              <div id="sample-output-1" style="display:none;margin-top:8px;background:rgba(0,255,255,0.05);border:1px solid var(--cyan);border-radius:6px;padding:10px;">
+                <div style="font-size:0.7rem;color:var(--cyan);margin-bottom:4px;font-family:'Orbitron',monospace;">EXPECTED OUTPUT</div>
+                <div id="expected-output-1" style="font-family:'Share Tech Mono',monospace;font-size:0.82rem;white-space:pre;color:var(--text);"></div>
+              </div>
+            </div>
+          </div>
+          <div class="arena-col arena-right">
+            <div class="arena-col-header"><span style="color:var(--green);">✏️ YOUR FIX</span><span style="font-size:0.62rem;color:var(--text-dim);">EDIT THE BUG — FULL CODE PRE-LOADED</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;padding:14px;gap:12px;">
+              <textarea class="answer-editor" id="answer-1" placeholder="" style="flex:1;min-height:220px;border-radius:6px;"></textarea>
+              <button class="btn btn-green btn-full" onclick="submitAnswer(1)">⚡ SUBMIT FIX</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Level 2 -->
+      <div id="level-section-2" class="level-section" style="display:none;">
+        <div class="secret-badge" style="background:rgba(0,255,255,0.05);border-color:var(--cyan);margin-bottom:10px;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--cyan);">LEVEL 2 — ESCALATION</div>
+          <div style="font-size:0.75rem;color:var(--text-dim);margin-top:3px;">200 Points + Finish Bonus</div>
+        </div>
+        <div id="desc-2" style="font-size:0.85rem;line-height:1.6;color:var(--text);background:rgba(0,20,0,0.6);padding:10px 14px;border-radius:6px;border-left:3px solid var(--cyan);margin-bottom:12px;"></div>
+        <div class="arena-split">
+          <div class="arena-col arena-left">
+            <div class="arena-col-header"><span style="color:var(--red);">🐛 BUGGY CODE</span><span style="font-size:0.62rem;color:var(--text-dim);">READ ONLY • ERRORS HIGHLIGHTED</span></div>
+            <div class="code-block" id="code-display-2" style="flex:1;max-height:none;min-height:240px;"></div>
+            <div style="padding:10px 14px;border-top:1px solid rgba(0,255,65,0.1);">
+              <button class="btn btn-cyan btn-sm btn-full" onclick="revealSample(2)">👁 REVEAL SAMPLE OUTPUT <span id="sample-count-2">(0/2)</span></button>
+              <div id="sample-output-2" style="display:none;margin-top:8px;background:rgba(0,255,255,0.05);border:1px solid var(--cyan);border-radius:6px;padding:10px;">
+                <div style="font-size:0.7rem;color:var(--cyan);margin-bottom:4px;font-family:'Orbitron',monospace;">EXPECTED OUTPUT</div>
+                <div id="expected-output-2" style="font-family:'Share Tech Mono',monospace;font-size:0.82rem;white-space:pre;color:var(--text);"></div>
+              </div>
+            </div>
+          </div>
+          <div class="arena-col arena-right">
+            <div class="arena-col-header"><span style="color:var(--cyan);">✏️ YOUR FIX</span><span style="font-size:0.62rem;color:var(--text-dim);">EDIT THE BUG — FULL CODE PRE-LOADED</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;padding:14px;gap:12px;">
+              <textarea class="answer-editor" id="answer-2" placeholder="" style="flex:1;min-height:220px;border-radius:6px;"></textarea>
+              <button class="btn btn-cyan btn-full" onclick="submitAnswer(2)">⚡ SUBMIT FIX</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Level 3 -->
+      <div id="level-section-3" class="level-section" style="display:none;">
+        <div class="secret-badge" style="background:rgba(255,215,0,0.05);border-color:var(--gold);margin-bottom:10px;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--gold);">LEVEL 3 — ANNIHILATION</div>
+          <div style="font-size:0.75rem;color:var(--text-dim);margin-top:3px;">300 Points + Finish Bonus</div>
+        </div>
+        <div id="desc-3" style="font-size:0.85rem;line-height:1.6;color:var(--text);background:rgba(0,20,0,0.6);padding:10px 14px;border-radius:6px;border-left:3px solid var(--gold);margin-bottom:12px;"></div>
+        <div class="arena-split">
+          <div class="arena-col arena-left">
+            <div class="arena-col-header"><span style="color:var(--red);">🐛 BUGGY CODE</span><span style="font-size:0.62rem;color:var(--text-dim);">READ ONLY • ERRORS HIGHLIGHTED</span></div>
+            <div class="code-block" id="code-display-3" style="flex:1;max-height:none;min-height:240px;"></div>
+            <div style="padding:10px 14px;border-top:1px solid rgba(0,255,65,0.1);">
+              <button class="btn btn-cyan btn-sm btn-full" onclick="revealSample(3)">👁 REVEAL SAMPLE OUTPUT <span id="sample-count-3">(0/2)</span></button>
+              <div id="sample-output-3" style="display:none;margin-top:8px;background:rgba(0,255,255,0.05);border:1px solid var(--cyan);border-radius:6px;padding:10px;">
+                <div style="font-size:0.7rem;color:var(--cyan);margin-bottom:4px;font-family:'Orbitron',monospace;">EXPECTED OUTPUT</div>
+                <div id="expected-output-3" style="font-family:'Share Tech Mono',monospace;font-size:0.82rem;white-space:pre;color:var(--text);"></div>
+              </div>
+            </div>
+          </div>
+          <div class="arena-col arena-right">
+            <div class="arena-col-header"><span style="color:var(--gold);">✏️ YOUR FIX</span><span style="font-size:0.62rem;color:var(--text-dim);">EDIT THE BUG — FULL CODE PRE-LOADED</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;padding:14px;gap:12px;">
+              <textarea class="answer-editor" id="answer-3" placeholder="" style="flex:1;min-height:220px;border-radius:6px;"></textarea>
+              <button class="btn btn-gold btn-full" onclick="submitAnswer(3)">⚡ SUBMIT FIX</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECRET LEVEL -->
+      <div id="level-section-s" class="level-section" style="display:none;">
+        <div class="secret-badge" style="margin-bottom:10px;">
+          <div class="secret-title">🌟 SECRET LEVEL — ULTIMATE CHALLENGE</div>
+          <div style="font-size:0.75rem;color:var(--text-dim);margin-top:3px;">BONUS • 30s Timer • First to finish = ULTIMATE DEBUGGER</div>
+        </div>
+        <div id="desc-s" style="font-size:0.85rem;line-height:1.6;color:var(--text);background:rgba(0,20,0,0.6);padding:10px 14px;border-radius:6px;border-left:3px solid var(--gold);margin-bottom:12px;"></div>
+        <div class="arena-split">
+          <div class="arena-col arena-left" style="border-color:rgba(255,215,0,0.3);">
+            <div class="arena-col-header"><span style="color:var(--red);">🐛 BUGGY CODE</span><span style="font-size:0.62rem;color:var(--text-dim);">READ ONLY • ERRORS HIGHLIGHTED</span></div>
+            <div class="code-block" id="code-display-s" style="flex:1;max-height:none;min-height:240px;"></div>
+            <div style="padding:10px 14px;border-top:1px solid rgba(255,215,0,0.15);">
+              <button class="btn btn-gold btn-sm btn-full" onclick="revealSample('s')">👁 REVEAL SAMPLE OUTPUT <span id="sample-count-s">(0/2)</span></button>
+              <div id="sample-output-s" style="display:none;margin-top:8px;background:rgba(255,215,0,0.05);border:1px solid var(--gold);border-radius:6px;padding:10px;">
+                <div style="font-size:0.7rem;color:var(--gold);margin-bottom:4px;font-family:'Orbitron',monospace;">EXPECTED OUTPUT</div>
+                <div id="expected-output-s" style="font-family:'Share Tech Mono',monospace;font-size:0.82rem;white-space:pre;color:var(--text);"></div>
+              </div>
+            </div>
+          </div>
+          <div class="arena-col arena-right" style="border-color:rgba(255,215,0,0.3);">
+            <div class="arena-col-header"><span style="color:var(--gold);">✏️ YOUR FIX</span><span style="font-size:0.62rem;color:var(--text-dim);">EDIT THE BUG — FULL CODE PRE-LOADED</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;padding:14px;gap:12px;">
+              <textarea class="answer-editor" id="answer-s" placeholder="" style="flex:1;min-height:220px;border-radius:6px;border-color:rgba(255,215,0,0.3);"></textarea>
+              <button class="btn btn-gold btn-full" onclick="submitAnswer('s')">⚡ SUBMIT ULTIMATE FIX</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timed out / Game Over screen -->
+      <div id="level-section-over" style="display:none;">
+        <div style="text-align:center;padding:60px 20px;">
+          <div style="font-size:80px;margin-bottom:20px;">💀</div>
+          <div style="font-family:'Orbitron',monospace;font-size:2rem;color:var(--red);text-shadow:0 0 20px var(--red);margin-bottom:16px;" id="over-title">GAME OVER</div>
+          <div style="color:var(--text-dim);margin-bottom:20px;" id="over-msg">Your debugging journey ends here.</div>
+          <div style="font-family:'Orbitron',monospace;font-size:1.4rem;color:var(--green);">Final Score: <span id="over-score">0</span></div>
+          <button class="btn btn-cyan mt-20" onclick="openPanel('panel-leaderboard','right');loadLeaderboard()">VIEW LEADERBOARD</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- leaderboard moved into landing panel -->
+
+<!-- ==================== PAGE: ADMIN ==================== -->
+<div class="section" id="admin-page" style="display:none;">
+
+  <!-- Admin Top Bar -->
+  <div id="admin-sticky-bar" style="position:sticky;top:0;z-index:200;background:rgba(0,3,0,0.99);border-bottom:2px solid rgba(255,0,64,0.4);padding:12px 20px;backdrop-filter:blur(10px);">
+    <div style="max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <button class="back-btn" onclick="showPage('landing')" style="pointer-events:auto;z-index:201;position:relative;border-color:var(--red);color:var(--red);">◀ EXIT</button>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--red);text-shadow:0 0 12px var(--red);font-weight:900;letter-spacing:2px;">🔐 ADMIN PANEL</div>
+        <span id="admin-event-status-big" style="font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:700;padding:3px 12px;border-radius:20px;background:rgba(255,165,0,0.15);border:1px solid orange;color:orange;">⏳ STANDBY</span>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <!-- Timer -->
+        <div style="display:flex;align-items:center;gap:6px;background:rgba(0,20,0,0.9);border:1px solid var(--border);border-radius:8px;padding:6px 14px;">
+          <span style="font-size:0.6rem;color:var(--text-dim);font-family:'Orbitron',monospace;">⏱ TIMER</span>
+          <span class="timer-display" id="admin-countdown" style="font-size:1.2rem;">--:--</span>
+        </div>
+        <span style="font-size:0.72rem;color:var(--cyan);font-family:'Orbitron',monospace;" id="admin-teams-online">Teams: 0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Body: Sidebar + Content -->
+  <div style="display:flex;min-height:calc(100vh - 60px);max-width:1400px;margin:0 auto;">
+
+    <!-- LEFT SIDEBAR -->
+    <div id="admin-sidebar" style="width:220px;flex-shrink:0;background:rgba(0,5,0,0.95);border-right:1px solid rgba(255,0,64,0.2);padding:16px 0;display:flex;flex-direction:column;gap:4px;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;">
+
+      <!-- Event Controls Section -->
+      <div style="padding:10px 16px 6px;font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--red);letter-spacing:2px;text-transform:uppercase;">EVENT CONTROL</div>
+      <button class="admin-side-btn admin-side-green" onclick="adminStartEvent()">▶ START EVENT</button>
+      <button class="admin-side-btn admin-side-orange" onclick="adminPauseEvent()">⏸ PAUSE</button>
+      <button class="admin-side-btn admin-side-cyan" onclick="adminResumeEvent()">▶ RESUME</button>
+      <button class="admin-side-btn admin-side-red" onclick="adminStopEvent()">⏹ STOP EVENT</button>
+      <button class="admin-side-btn admin-side-pink" onclick="adminResetEvent()">🔄 FULL RESET</button>
+
+      <div style="height:1px;background:rgba(255,0,64,0.15);margin:10px 16px;"></div>
+
+      <!-- Announcement -->
+      <div style="padding:6px 16px 6px;font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--orange);letter-spacing:2px;text-transform:uppercase;">BROADCAST</div>
+      <div style="padding:4px 12px;">
+        <input type="text" id="announcement-input" placeholder="📢 Announcement..." style="width:100%;font-size:0.75rem;padding:7px 10px;background:rgba(0,20,0,0.9);border:1px solid var(--border);color:var(--text);border-radius:6px;font-family:'Share Tech Mono',monospace;">
+        <button class="admin-side-btn admin-side-green" onclick="sendAnnouncement()" style="margin-top:6px;width:100%;">📢 SEND</button>
+      </div>
+
+      <div style="height:1px;background:rgba(255,0,64,0.15);margin:10px 16px;"></div>
+
+      <!-- Navigation -->
+      <div style="padding:6px 16px 6px;font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;">SECTIONS</div>
+      <button class="admin-nav-btn active" id="anav-teams" onclick="adminSwitchTab('teams')">👥 Teams <span id="badge-teams" style="display:none;background:var(--green);color:#000;border-radius:10px;padding:0 5px;font-size:0.6rem;float:right;"></span></button>
+      <button class="admin-nav-btn" id="anav-lb" onclick="adminSwitchTab('lb')">🏆 Leaderboard</button>
+      <button class="admin-nav-btn" id="anav-overrides" onclick="adminSwitchTab('overrides')">⚖️ Overrides <span id="badge-overrides" style="display:none;background:var(--orange);color:#000;border-radius:10px;padding:0 5px;font-size:0.6rem;float:right;"></span></button>
+      <button class="admin-nav-btn" id="anav-help" onclick="adminSwitchTab('help')">🆘 Help Requests <span id="badge-help" style="display:none;background:var(--red);color:#fff;border-radius:10px;padding:0 5px;font-size:0.6rem;float:right;"></span></button>
+      <button class="admin-nav-btn" id="anav-logs" onclick="adminSwitchTab('logs')">📋 Activity Log <span id="badge-logs" style="display:none;background:var(--cyan);color:#000;border-radius:10px;padding:0 5px;font-size:0.6rem;float:right;"></span></button>
+      <button class="admin-nav-btn" id="anav-codeedit" onclick="adminSwitchTab('codeedit')">✏️ Code Editor</button>
+    </div>
+
+    <!-- RIGHT CONTENT AREA -->
+    <div style="flex:1;padding:24px;overflow-x:auto;">
+
+      <!-- TAB: TEAMS -->
+      <div id="atab-content-teams">
+        <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--green);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);">👥 ALL TEAMS</div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+            <div id="admin-team-summary" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <select id="team-filter" onchange="loadAdminTeams()" style="font-size:0.72rem;padding:4px 8px;background:rgba(0,20,0,0.8);border:1px solid var(--border);color:var(--text);border-radius:4px;">
+                <option value="all">All Statuses</option>
+                <option value="Waiting">Waiting</option>
+                <option value="Ready">Ready</option>
+                <option value="In Progress">Active</option>
+                <option value="Completed">Completed</option>
+                <option value="Disqualified">DQ</option>
+                <option value="TimedOut">Timed Out</option>
+                <option value="Game Over">Game Over</option>
+              </select>
+              <button class="btn btn-cyan btn-sm" onclick="loadAdminTeams()">↻ REFRESH</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="teams-table">
+              <thead>
+                <tr>
+                  <th>#</th><th>Team</th><th>Players</th><th>Score</th><th>Level</th><th>Lives</th><th>Status</th><th>Warnings</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-teams-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: LEADERBOARD -->
+      <div id="atab-content-lb" style="display:none;">
+        <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--green);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);">🏆 LIVE LEADERBOARD</div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div style="font-size:0.7rem;color:var(--text-dim);" id="admin-lb-update">—</div>
+            <button class="btn btn-cyan btn-sm" onclick="loadAdminLeaderboard()">↻ REFRESH</button>
+          </div>
+          <div id="admin-lb-preview" style="max-height:600px;overflow-y:auto;"></div>
+        </div>
+      </div>
+
+      <!-- TAB: OVERRIDES -->
+      <div id="atab-content-overrides" style="display:none;">
+        <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--orange);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);">⚖️ ANSWER OVERRIDE QUEUE</div>
+        <div class="card">
+          <div id="override-list"><div style="color:var(--text-dim);font-size:0.8rem;">No pending overrides</div></div>
+        </div>
+      </div>
+
+      <!-- TAB: HELP -->
+      <div id="atab-content-help" style="display:none;">
+        <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--orange);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);">🆘 HELP REQUESTS</div>
+        <div class="card">
+          <div id="help-requests-list"><div style="color:var(--text-dim);font-size:0.8rem;">No pending requests</div></div>
+        </div>
+      </div>
+
+      <!-- TAB: LOGS -->
+      <div id="atab-content-logs" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+          <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--cyan);">📋 ACTIVITY LOG</div>
+          <button class="btn btn-sm" style="color:var(--red);border-color:var(--red);font-size:0.6rem;" onclick="clearActivityLog()">🗑 CLEAR</button>
+        </div>
+        <div class="card">
+          <div class="log-list" id="activity-log" style="max-height:600px;"></div>
+        </div>
+      </div>
+
+      <!-- TAB: CODE EDITOR -->
+      <div id="atab-content-codeedit" style="display:none;">
+        <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--cyan);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);">✏️ BUGGY CODE EDITOR</div>
+        <div class="card">
+          <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+            <label style="color:var(--text-dim);font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;margin:0;">Level:</label>
+            <select id="codeedit-level" onchange="adminLoadCodeEditor()" style="font-size:0.78rem;padding:6px 10px;background:rgba(0,20,0,0.9);border:1px solid var(--border);color:var(--text);border-radius:4px;font-family:'Share Tech Mono',monospace;">
+              <option value="1">Level 1 — Counter Chaos</option>
+              <option value="2">Level 2 — String Surgery</option>
+              <option value="3">Level 3 — List Logic</option>
+              <option value="s">Secret Level — Sort & Conquer</option>
+            </select>
+            <button class="btn btn-cyan btn-sm" onclick="adminLoadCodeEditor()">↻ LOAD</button>
+            <button class="btn btn-green btn-sm" onclick="adminSaveCodeEditor()">💾 SAVE & APPLY</button>
+          </div>
+          <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">Edit each line. Tick <span style="color:var(--red);font-weight:700;">BUG</span> to mark a line as buggy for your reference.</div>
+          <div id="codeedit-lines" style="display:flex;flex-direction:column;gap:3px;max-height:500px;overflow-y:auto;"></div>
+          <div style="margin-top:14px;">
+            <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:6px;">EXPECTED OUTPUT</div>
+            <textarea id="codeedit-expected" style="width:100%;background:rgba(0,20,0,0.8);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;min-height:70px;resize:vertical;" placeholder="Expected output..."></textarea>
+          </div>
+          <div style="margin-top:10px;">
+            <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:6px;">DESCRIPTION</div>
+            <input type="text" id="codeedit-desc" style="width:100%;background:rgba(0,20,0,0.8);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;" placeholder="Level description...">
+          </div>
+          <div id="codeedit-status" style="margin-top:10px;font-size:0.8rem;color:var(--green);display:none;font-family:'Orbitron',monospace;"></div>
+        </div>
+      </div>
+
+    </div><!-- end content -->
+  </div><!-- end body -->
+</div>
+
+<!-- ==================== PAGE: SPECTATOR ==================== -->
+<!-- spectator moved into landing panel -->
+
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
+<script>
+// =====================================================================
+//  MATRIX RAIN
+// =====================================================================
+(function(){
+  const c=document.getElementById('matrix-bg');
+  const ctx=c.getContext('2d');
+  let w,h,cols,drops;
+  function resize(){
+    w=c.width=window.innerWidth;
+    h=c.height=window.innerHeight;
+    cols=Math.floor(w/16);
+    drops=Array(cols).fill(1);
+  }
+  resize();
+  window.addEventListener('resize',resize);
+  const chars='アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン0123456789ABCDEF';
+  function draw(){
+    ctx.fillStyle='rgba(0,5,0,0.05)';
+    ctx.fillRect(0,0,w,h);
+    ctx.fillStyle='#00ff41';
+    ctx.font='14px Share Tech Mono, monospace';
+    for(let i=0;i<drops.length;i++){
+      const t=chars[Math.floor(Math.random()*chars.length)];
+      ctx.fillText(t,i*16,drops[i]*16);
+      if(drops[i]*16>h&&Math.random()>0.975) drops[i]=0;
+      drops[i]++;
+    }
+  }
+  setInterval(draw,50);
+})();
+
+// =====================================================================
+//  GLOBAL STATE
+// =====================================================================
+let db=null;
+let demoMode=false;
+let currentTeamId=null;
+let currentTeam=null;
+let eventState={status:'standby',startTime:null,pausedAt:null,pauseOffset:0};
+let timerInterval=null;
+let currentLevelKey=1; // 1,2,3,'s'
+let sampleReveals={1:0,2:0,3:0,s:0};
+let refreshCount=0;
+let tabSwitchCount=0;
+let violationCount=0;
+let gracePeriod=false;
+let graceTimer=null;
+let specView='lb';
+let spectatorTeams={};
+let specTimerInterval=null;
+let adminLoggedIn=false;
+let demoTeams={};
+let overrideQueue=[];
+let helpRequests=[];
+
+// QUESTIONS — 3 bugs per level
+const QUESTIONS={
+  1:{
+    title:'Level 1 — The Counter Chaos',
+    description:'This function should print numbers 1 to 5, then show the total sum. Three bugs are hiding — find and fix them all!',
+    code:[
+      {n:1, code:'def count_and_sum():'},
+      {n:2, code:'    total = 0'},
+      {n:3, code:'    for i in range(1, 6):'},
+      {n:4, code:'        print(i - 1)',bug:true},
+      {n:5, code:'        total += i'},
+      {n:6, code:'    print("Sum:", totl)',bug:true},
+      {n:7, code:''},
+      {n:8, code:'count_and_sum(10)',bug:true},
+    ],
+    expectedOutput:'1\n2\n3\n4\n5\nSum: 15',
+    // bugs: line4 should be print(i), line6 totl->total, line8 no arg
+    bugLines:[4,6,8],
+    answers:{
+      4:'        print(i)',
+      6:'    print("Sum:", total)',
+      8:'count_and_sum()'
+    },
+    altAnswers:{
+      4:['        print(i)','    print(i)','print(i)'],
+      6:['    print("Sum:", total)','print("Sum:", total)'],
+      8:['count_and_sum()']
+    }
+  },
+  2:{
+    title:'Level 2 — String Surgery',
+    description:'This function should reverse a string, count its vowels, and print both. Three bugs lurk inside!',
+    code:[
+      {n:1, code:'def analyse_string(s):'},
+      {n:2, code:'    reversed_s = s[::-1]'},
+      {n:3, code:'    vowels = "aeiou"'},
+      {n:4, code:'    count = 0'},
+      {n:5, code:'    for ch in s:'},
+      {n:6, code:'        if ch in vowels:'},
+      {n:7, code:'            count + 1',bug:true},
+      {n:8, code:'    print("Reversed:", reversed_s)'},
+      {n:9, code:'    print("Vowels:", count)'},
+      {n:10,code:''},
+      {n:11,code:'analyse_string("Hello World"',bug:true},
+      {n:12,code:'analyse_String("Python")',bug:true},
+    ],
+    expectedOutput:'Reversed: dlroW olleH\nVowels: 3\nReversed: nohtyP\nVowels: 1',
+    bugLines:[7,11,12],
+    answers:{
+      7:'            count += 1',
+      11:'analyse_string("Hello World")',
+      12:'analyse_string("Python")'
+    },
+    altAnswers:{
+      7:['            count += 1','count += 1'],
+      11:['analyse_string("Hello World")'],
+      12:['analyse_string("Python")']
+    }
+  },
+  3:{
+    title:'Level 3 — List Logic Failure',
+    description:'This function should find the largest number in a list and its index. Three bugs are sabotaging the result!',
+    code:[
+      {n:1, code:'def find_largest(nums):'},
+      {n:2, code:'    max_val = nums[0]'},
+      {n:3, code:'    max_idx = 0'},
+      {n:4, code:'    for i in range(len(nums)):'},
+      {n:5, code:'        if nums[i] > max_val:'},
+      {n:6, code:'            max_val = nums[1]',bug:true},
+      {n:7, code:'            max_idx = i'},
+      {n:8, code:'    print("Largest:", max_val)'},
+      {n:9, code:'    print("Index:", max_idx)'},
+      {n:10,code:''},
+      {n:11,code:'find_largest([3, 7, 1, 9, 4])'},
+      {n:12,code:'find_largest([10, 2, 8])',bug:true},
+      {n:13,code:'find_largest([])',bug:true},
+    ],
+    expectedOutput:'Largest: 9\nIndex: 3\nLargest: 10\nIndex: 0',
+    bugLines:[6,12,13],
+    answers:{
+      6:'            max_val = nums[i]',
+      12:'find_largest([10, 2, 8])',
+      13:'find_largest([5, 3, 8])'
+    },
+    altAnswers:{
+      6:['            max_val = nums[i]','max_val = nums[i]'],
+      12:['find_largest([10, 2, 8])'],
+      13:['find_largest([5, 3, 8])','find_largest([1, 2, 3])']
+    }
+  },
+  s:{
+    title:'SECRET LEVEL — Sort & Conquer',
+    description:'Bubble sort should sort ascending AND print the sum. Three critical bugs broke it all!',
+    code:[
+      {n:1, code:'def bubble_sort(arr):'},
+      {n:2, code:'    n = len(arr)'},
+      {n:3, code:'    for i in range(n):'},
+      {n:4, code:'        for j in range(0, n-i-1):'},
+      {n:5, code:'            if arr[j] < arr[j+1]:',bug:true},
+      {n:6, code:'                arr[j], arr[j+1] = arr[j+1], arr[j]'},
+      {n:7, code:'    print("Sorted:", arr)'},
+      {n:8, code:'    print("Sum:", sum(arr))'},
+      {n:9, code:''},
+      {n:10,code:'bubble_sort([64, 34, 25, 12, 22])'},
+      {n:11,code:'bubble_sort([5, 3, 8, 1])',bug:true},
+      {n:12,code:'print("Done" + 1)',bug:true},
+    ],
+    expectedOutput:'Sorted: [12, 22, 25, 34, 64]\nSum: 157\nSorted: [1, 3, 5, 8]\nSum: 17\nDone',
+    bugLines:[5,11,12],
+    answers:{
+      5:'            if arr[j] > arr[j+1]:',
+      11:'bubble_sort([5, 3, 8, 1])',
+      12:'print("Done")'
+    },
+    altAnswers:{
+      5:['            if arr[j] > arr[j+1]:','if arr[j] > arr[j+1]:'],
+      11:['bubble_sort([5, 3, 8, 1])'],
+      12:['print("Done")']
+    }
+  }
+};
+
+// AVENGERS/TAMIL dialogues
+const SUCCESS_MSGS=[
+  "🦾 Thanos vanished! Bug fixed, Avenger!",
+  "⚡ Aiyoooo! Perfect fix da! Thor is proud!",
+  "🌟 Correct answer! Even Iron Man is impressed!",
+  "💥 Bug destroyed! Like Hulk smashing puny code!",
+  "🔥 Epdi fix panninga! Superb da!",
+  "✅ Code pached! Captain would salute you!",
+  "🎯 On point! Strange says 'I went forward in time...'",
+  "⚡ Correct! Wakanda forever!"
+];
+const FAIL_MSGS=[
+  "💀 Aiyoo! Wrong answer da! -1 Life!",
+  "😤 That's not it. Try harder, Avenger!",
+  "❌ Thanos laughs at your attempt. Try again!",
+  "💔 Iron Man's arc reactor flickered. Wrong!",
+  "🤦 Even Ant-Man could fix this. Try again!",
+  "⚠️ Galactus is unimpressed. Wrong answer!",
+  "😱 Aiyoo paavam! Wrong la! Think again!"
+];
+const VIOLATION_MSGS=[
+  "⚠️ Tab switch detected! Endgame for cheaters!",
+  "🚨 Copying disabled! Debug yourself hero!",
+  "🔐 Copy paste? Naan illam, this is not Googling competition!"
+];
+
+function getRand(arr){return arr[Math.floor(Math.random()*arr.length)];}
+
+// =====================================================================
+//  FIREBASE INIT
+// =====================================================================
+function saveFirebaseConfig(){
+  const cfg={
+    apiKey:document.getElementById('cfg-apiKey').value.trim(),
+    authDomain:document.getElementById('cfg-authDomain').value.trim(),
+    databaseURL:document.getElementById('cfg-dbUrl').value.trim(),
+    projectId:document.getElementById('cfg-projectId').value.trim(),
+    appId:document.getElementById('cfg-appId').value.trim()
+  };
+  if(!cfg.databaseURL){showToast('Enter database URL','error');return;}
+  localStorage.setItem('jarfix_fbconfig',JSON.stringify(cfg));
+  initFirebase(cfg);
+}
+
+function useDemo(){
+  demoMode=true;
+  localStorage.setItem('jarfix_demo','1');
+  hideLoading();
+  showPage('landing');
+}
+
+function initFirebase(cfg){
+  cfg = cfg || FIREBASE_CONFIG;
+
+  function goToLanding(){
+    hideLoading();
+    if(!restoreSession()){
+      showPage('landing');
+      const nav=document.getElementById('top-nav');
+      if(nav){ nav.classList.add('visible'); document.body.classList.add('nav-visible'); }
+      setTimeout(startDialogue, 300);
+    }
+    setupGlobalListeners();
+  }
+
+  // Hard fallback — no matter what, show the app within 2.5s
+  const hardTimeout = setTimeout(()=>{
+    console.warn('JarFix: Hard timeout — showing app without Firebase');
+    goToLanding();
+  }, 2500);
+
+  try{
+    if(typeof firebase === 'undefined'){
+      console.error('Firebase SDK not loaded');
+      clearTimeout(hardTimeout);
+      goToLanding();
+      return;
+    }
+    if(firebase.apps.length===0){
+      firebase.initializeApp(cfg);
+    }
+    db = firebase.database();
+
+    let launched = false;
+    function launch(){
+      if(launched) return;
+      launched = true;
+      clearTimeout(hardTimeout);
+      goToLanding();
+    }
+
+    // Launch immediately on connected=true
+    db.ref('.info/connected').on('value', snap=>{
+      if(snap.val() === true){
+        showToast('⚡ Firebase connected!','success');
+        launch();
+      }
+    });
+
+    // Safety net at 2s in case .info/connected stays false
+    setTimeout(launch, 2000);
+
+  }catch(e){
+    console.error('Firebase init error:', e);
+    clearTimeout(hardTimeout);
+    showToast('Offline mode — Firebase error','warn');
+    goToLanding();
+  }
+}
+
+function setupGlobalListeners(){
+  if(demoMode||!db) return;
+  // Listen to event state
+  db.ref('eventState').on('value',snap=>{
+    if(snap.val()){
+      eventState=snap.val();
+      handleEventStateChange();
+    }
+  });
+  // Listen to announcements
+  db.ref('announcement').on('value',snap=>{
+    if(snap.val()&&snap.val().text){
+      showAnnouncementBanner(snap.val().text);
+    }
+  });
+}
+
+function handleEventStateChange(){
+  const startedMsg=document.getElementById('event-started-msg');
+  const waitingMsg=document.getElementById('event-waiting-msg');
+  if(eventState.status==='running'){
+    if(startedMsg) startedMsg.style.display='block';
+    if(waitingMsg) waitingMsg.style.display='none';
+    // Auto-enter game if team is on lobby page
+    const lobbyPage=document.getElementById('lobby-page');
+    if(lobbyPage&&lobbyPage.style.display!=='none'&&currentTeam&&!currentTeam.disqualified){
+      showToast('🚀 EVENT STARTED! Entering arena...','success');
+      setTimeout(()=>enterGamePage(),1200);
+    }
+    // If already on game page, sync timer
+    const gamePage=document.getElementById('game-page');
+    if(gamePage&&gamePage.style.display!=='none'){
+      startGlobalTimer();
+    }
+  }else if(eventState.status==='paused'){
+    stopTimerInterval();
+    showToast('⏸ Event paused by admin','warn');
+  }else if(eventState.status==='stopped'){
+    stopTimerInterval();
+    showToast('Event has ended','info');
+  }
+}
+
+// =====================================================================
+//  LOADING & PAGE MANAGEMENT
+// =====================================================================
+function hideLoading(){
+  const ls=document.getElementById('loading-screen');
+  if(!ls) return;
+  ls.style.transition='opacity 0.4s';
+  ls.style.opacity='0';
+  setTimeout(()=>{ ls.style.display='none'; },420);
+}
+
+function showPage(id){
+  // Single-page: hide all sections, show the target
+  document.querySelectorAll('.section').forEach(s=>{
+    s.classList.remove('active');
+    s.style.display='none';
+  });
+  const el = document.getElementById(id);
+  if(el){
+    el.classList.add('active');
+    // #landing uses display:flex via its ID CSS rule; others use block
+    el.style.display = (id==='landing') ? 'flex' : 'block';
+  }
+  window.scrollTo(0,0);
+  updateNav(id);
+  // If going to landing, reset card and panels
+  if(id==='landing'){
+    const card=document.getElementById('main-card');
+    if(card){ card.className='card-3d-scene'; card.style.visibility='visible'; card.style.pointerEvents=''; }
+    document.querySelectorAll('.landing-panel').forEach(p=>p.classList.remove('panel-in'));
+    activePanel=null;
+    // Reset card faces
+    const fA=document.getElementById('card-face-a');
+    const fB=document.getElementById('card-face-b');
+    if(fA){ fA.style.display='flex'; fA.style.opacity='1'; fA.style.transform='scale(1) translateY(0)'; }
+    if(fB){ fB.style.opacity='0'; fB.style.transform='scale(0.9)'; fB.style.pointerEvents='none'; }
+    setTimeout(startDialogue,300);
+  }
+}
+
+function navTo(id){
+  showPage(id);
+  if(id==='landing') setTimeout(startDialogue,300);
+}
+
+function updateNav(activeId){
+  const nav = document.getElementById('top-nav');
+  if(!nav) return;
+  if(activeId==='config-page'){
+    nav.classList.remove('visible');
+    document.body.classList.remove('nav-visible');
+    return;
+  }
+  nav.classList.add('visible');
+  document.body.classList.add('nav-visible');
+  // Only highlight admin if on admin page
+  const adminBtn=document.getElementById('nav-admin');
+  if(adminBtn){
+    if(activeId==='admin-page') adminBtn.classList.add('active');
+    else adminBtn.classList.remove('active');
+  }
+}
+
+function showNavBtn(id){ const el=document.getElementById(id); if(el) el.style.display=''; }
+
+// =====================================================================
+//  PANEL SYSTEM — card flies out, panel slides in
+// =====================================================================
+let activePanel=null;
+
+function openPanel(panelId, direction){
+  // Fly card out
+  const card=document.getElementById('main-card');
+  const dirMap={left:'fly-out-left',right:'fly-out-right',up:'fly-out-up',bottom:'fly-out-down'};
+  if(card){
+    card.className='card-3d-scene';
+    // force reflow
+    void card.offsetWidth;
+    card.classList.add(dirMap[direction]||'fly-out-left');
+    // Completely hide after animation
+    setTimeout(()=>{ card.style.visibility='hidden'; card.style.pointerEvents='none'; }, 500);
+  }
+  // Close any currently open panel
+  if(activePanel && activePanel!==panelId){
+    const prev=document.getElementById(activePanel);
+    if(prev) prev.classList.remove('panel-in');
+  }
+  // Slide panel in after short delay
+  setTimeout(()=>{
+    const panel=document.getElementById(panelId);
+    if(panel) panel.classList.add('panel-in');
+    activePanel=panelId;
+  }, 220);
+}
+
+function closePanel(panelId){
+  const panel=document.getElementById(panelId);
+  if(panel) panel.classList.remove('panel-in');
+  activePanel=null;
+  // Fly card back in
+  setTimeout(()=>{
+    const card=document.getElementById('main-card');
+    if(card){
+      card.style.visibility='visible';
+      card.style.pointerEvents='';
+      card.className='card-3d-scene';
+      card.style.opacity='1';
+    }
+  }, 50);
+}
+
+function goBackToCard(){
+  if(activePanel) closePanel(activePanel);
+}
+
+// =====================================================================
+//  LANDING CARD — FACE FLIP
+// =====================================================================
+const DIALOGUES = [
+  'Bugs are not features. They are crimes against logic.',
+  'The code does not lie. Your logic does.',
+  'En pera kekka vendam, code fix pannu da!',
+  'Even Thanos could not debug what you are about to face.',
+  'Seri da. Kalama iruku. But can you fix it?',
+  'Three levels. One brain. Zero excuses.',
+  'Iron Man had Friday. You have your brain. Good luck.',
+  'Paaru da... somewhere in this code hides the villain.'
+];
+
+let dialogueInterval=null;
+let typewriterTimeout=null;
+
+// =====================================================================
+//  3D CARD TILT — JS MOUSEMOVE (CSS grid hover removed, was blocking clicks)
+// =====================================================================
+(function setupCardTilt(){
+  const card=document.getElementById('main-card');
+  if(!card) return;
+  const inner=card.querySelector('.card-3d-inner');
+  if(!inner) return;
+  card.addEventListener('mousemove',e=>{
+    const rect=card.getBoundingClientRect();
+    const x=e.clientX-rect.left;
+    const y=e.clientY-rect.top;
+    const cx=rect.width/2, cy=rect.height/2;
+    const rotY=((x-cx)/cx)*10;
+    const rotX=-((y-cy)/cy)*10;
+    inner.style.transform=`rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
+  });
+  card.addEventListener('mouseleave',()=>{
+    inner.style.transform='rotateX(0) rotateY(0) scale(1)';
+  });
+})();
+
+function startDialogue(){
+  let i=0;
+  function showNext(){
+    typeDialogue(DIALOGUES[i % DIALOGUES.length]);
+    i++;
+  }
+  showNext();
+  dialogueInterval=setInterval(showNext,4000);
+}
+
+function typeDialogue(text){
+  const el=document.getElementById('card-dialogue');
+  if(!el) return;
+  if(typewriterTimeout) clearTimeout(typewriterTimeout);
+  el.textContent='';
+  let j=0;
+  function type(){
+    if(j<text.length){
+      el.textContent+=text[j++];
+      typewriterTimeout=setTimeout(type,32);
+    }
+  }
+  type();
+}
+
+function enterArena(){
+  const faceA=document.getElementById('card-face-a');
+  const faceB=document.getElementById('card-face-b');
+  if(!faceA||!faceB) return;
+  // Stop dialogue
+  if(dialogueInterval){ clearInterval(dialogueInterval); dialogueInterval=null; }
+  // Fade out face A
+  faceA.style.transition='opacity 0.3s ease, transform 0.3s ease';
+  faceA.style.opacity='0';
+  faceA.style.transform='scale(0.9) translateY(-10px)';
+  // Fade in face B
+  setTimeout(()=>{
+    faceA.style.display='none';
+    faceB.style.opacity='1';
+    faceB.style.transform='scale(1)';
+    faceB.style.pointerEvents='auto';
+  }, 280);
+}
+
+function exitArena(){
+  const faceA=document.getElementById('card-face-a');
+  const faceB=document.getElementById('card-face-b');
+  if(!faceA||!faceB) return;
+  // Fade out face B
+  faceB.style.opacity='0';
+  faceB.style.transform='scale(0.9)';
+  faceB.style.pointerEvents='none';
+  setTimeout(()=>{
+    faceA.style.display='flex';
+    void faceA.offsetWidth;
+    faceA.style.transition='opacity 0.35s ease, transform 0.35s ease';
+    faceA.style.opacity='1';
+    faceA.style.transform='scale(1) translateY(0)';
+    startDialogue();
+  }, 260);
+}
+
+function showHelp(){
+  if(adminLoggedIn) return;
+  document.getElementById('help-btn').classList.add('visible');
+}
+
+// =====================================================================
+//  TEAM REGISTRATION
+// =====================================================================
+function registerTeam(){
+  const teamName=document.getElementById('reg-team').value.trim();
+  const p1=document.getElementById('reg-p1').value.trim();
+  const p2=document.getElementById('reg-p2').value.trim();
+  if(!teamName||!p1||!p2){showToast('Fill all fields!','error');return;}
+
+  const teamData={
+    teamName,
+    players:[p1,p2],
+    score:0,
+    level:1,
+    lives:2,
+    rank:999,
+    status:'Waiting',
+    warnings:0,
+    refreshCount:0,
+    completedLevels:[],
+    currentLevelStart:null,
+    secretUnlocked:false,
+    disqualified:false,
+    timedOut:false,
+    sampleReveals:{1:0,2:0,3:0,s:0}
+  };
+
+  if(demoMode){
+    const id='team_'+Date.now();
+    currentTeamId=id;
+    currentTeam=teamData;
+    demoTeams[id]=teamData;
+    localStorage.setItem('jarfix_teamId',id);
+    localStorage.setItem('jarfix_team',JSON.stringify(teamData));
+    goToLobby();
+    return;
+  }
+
+  const id='team_'+Date.now()+'_'+Math.random().toString(36).substr(2,5);
+  db.ref('teams/'+id).set(teamData).then(()=>{
+    currentTeamId=id;
+    currentTeam=teamData;
+    localStorage.setItem('jarfix_teamId',id);
+    logActivity(id,'registration','Team registered: '+teamName);
+    goToLobby();
+  }).catch(e=>showToast('Error: '+e.message,'error'));
+}
+
+function goToLobby(){
+  if(!currentTeam) return;
+  document.getElementById('lobby-team-name').textContent=currentTeam.teamName;
+  document.getElementById('lobby-p1').textContent=currentTeam.players[0];
+  document.getElementById('lobby-p2').textContent=currentTeam.players[1];
+  document.getElementById('game-team-name-display').textContent=currentTeam.teamName;
+  showPage('lobby-page');
+  showHelp();
+  showNavBtn('nav-lobby');
+  showNavBtn('nav-game');
+  listenToEventState();
+  loadLobbyTeams();
+  // Reset ready/unready button state based on current status
+  const readyBtn=document.getElementById('ready-btn');
+  const unreadyBtn=document.getElementById('unready-btn');
+  if(currentTeam.status==='Ready'){
+    if(readyBtn) readyBtn.style.display='none';
+    if(unreadyBtn) unreadyBtn.style.display='';
+    document.getElementById('lobby-status-display').className='status-badge status-ready';
+    document.getElementById('lobby-status-display').textContent='READY';
+  }else{
+    if(readyBtn) readyBtn.style.display='';
+    if(unreadyBtn) unreadyBtn.style.display='none';
+  }
+  showToast('Registered! Welcome '+currentTeam.teamName,'success');
+}
+
+function setReady(){
+  if(!currentTeamId) return;
+  currentTeam.status='Ready';
+  updateTeam({status:'Ready'});
+  document.getElementById('lobby-status-display').className='status-badge status-ready';
+  document.getElementById('lobby-status-display').textContent='READY';
+  // Toggle buttons
+  const readyBtn=document.getElementById('ready-btn');
+  const unreadyBtn=document.getElementById('unready-btn');
+  if(readyBtn) readyBtn.style.display='none';
+  if(unreadyBtn) unreadyBtn.style.display='';
+  showToast('Marked ready! ✅','success');
+}
+
+function setUnready(){
+  if(!currentTeamId) return;
+  currentTeam.status='Waiting';
+  updateTeam({status:'Waiting'});
+  document.getElementById('lobby-status-display').className='status-badge status-waiting';
+  document.getElementById('lobby-status-display').textContent='WAITING';
+  // Toggle buttons
+  const readyBtn=document.getElementById('ready-btn');
+  const unreadyBtn=document.getElementById('unready-btn');
+  if(readyBtn) readyBtn.style.display='';
+  if(unreadyBtn) unreadyBtn.style.display='none';
+  showToast('Marked as waiting','warn');
+}
+
+function listenToEventState(){
+  if(demoMode){return;}
+  db.ref('eventState').on('value',snap=>{
+    if(!snap.val()) return;
+    eventState=snap.val();
+    if(eventState.status==='running'){
+      document.getElementById('event-started-msg').style.display='block';
+      document.getElementById('event-waiting-msg').style.display='none';
+      // Auto-enter game from lobby
+      const lobbyPage=document.getElementById('lobby-page');
+      if(lobbyPage&&lobbyPage.style.display!=='none'&&currentTeam&&!currentTeam.disqualified){
+        showToast('🚀 EVENT STARTED! Entering arena...','success');
+        setTimeout(()=>enterGamePage(),1200);
+      }
+    }
+  });
+}
+
+function loadLobbyTeams(){
+  const list=document.getElementById('lobby-teams-list');
+  if(demoMode){
+    list.innerHTML=renderLobbyTeamsList(Object.values(demoTeams));
+    return;
+  }
+  db.ref('teams').on('value',snap=>{
+    const teams=snap.val()||{};
+    list.innerHTML=renderLobbyTeamsList(Object.values(teams));
+  });
+}
+
+function renderLobbyTeamsList(teams){
+  if(!teams.length) return '<div style="color:var(--text-dim);font-size:0.8rem;padding:10px;">No teams registered yet</div>';
+  return teams.map(t=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid rgba(0,255,65,0.08);">
+      <div>
+        <div style="font-size:0.85rem;font-weight:700;">${escHtml(t.teamName)}</div>
+        <div style="font-size:0.75rem;color:var(--text-dim);">${t.players?t.players.join(' & '):''}</div>
+      </div>
+      <div class="status-badge ${getStatusClass(t.status)}">${t.status||'Waiting'}</div>
+    </div>
+  `).join('');
+}
+
+function getStatusClass(s){
+  const map={Waiting:'status-waiting',Ready:'status-ready','In Progress':'status-playing',Completed:'status-ready',Disqualified:'status-dq',TimedOut:'status-timedout','Game Over':'status-dq'};
+  return map[s]||'status-waiting';
+}
+
+function getStatusIcon(s){
+  const map={Waiting:'⏳',Ready:'✅','In Progress':'⚡',Completed:'🏁',Disqualified:'💀',TimedOut:'⏰','Game Over':'💥'};
+  return map[s]||'⏳';
+}
+
+function renderLivesAdmin(lives){
+  const max=2;const l=lives||0;
+  return Array.from({length:max},(_,i)=>`<span style="font-size:0.9rem;${i>=l?'opacity:0.2;filter:grayscale(1);':''}">❤️</span>`).join('');
+}
+
+function adminResetTeam(teamId){
+  if(!confirm('Reset this team to fresh state?')) return;
+  const reset={score:0,level:1,lives:2,status:'Waiting',completedLevels:[],warnings:0,disqualified:false,timedOut:false,secretUnlocked:false,sampleReveals:{1:0,2:0,3:0,s:0},levelStartTimes:{}};
+  if(demoMode&&demoTeams[teamId]) Object.assign(demoTeams[teamId],reset);
+  else if(db) db.ref('teams/'+teamId).update(reset);
+  logActivity(teamId,'team_reset','Team reset by admin');
+  showToast('Team reset!','warn');
+  loadAdminTeams();
+}
+
+// =====================================================================
+//  GAME LOGIC
+// =====================================================================
+function enterGamePage(){
+  if(!currentTeam) return;
+  if(currentTeam.disqualified){showModal('💀','DISQUALIFIED','Your team has been disqualified.',[],'danger');return;}
+  updateTeam({status:'In Progress'});
+  currentTeam.status='In Progress';
+  currentLevelKey=currentTeam.level||1;
+  sampleReveals=currentTeam.sampleReveals||{1:0,2:0,3:0,s:0};
+  showPage('game-page');
+  renderGameLevel(currentLevelKey);
+  renderHUD();
+  startGlobalTimer();
+  listenTeamUpdates();
+  listenRankUpdate();
+  listenGlobalLeaderboardSignal();
+}
+
+function renderGameLevel(lvl){
+  // Hide all sections
+  [1,2,3,'s','over'].forEach(l=>{
+    const el=document.getElementById('level-section-'+l);
+    if(el) el.style.display='none';
+  });
+  // Update level dots
+  [1,2,3,'s'].forEach(l=>{
+    const dot=document.getElementById('ldot-'+l);
+    if(!dot) return;
+    dot.className='level-dot';
+    if(l===lvl){dot.classList.add('active');}
+    else if(currentTeam.completedLevels&&currentTeam.completedLevels.includes(l)){dot.classList.add('completed');}
+    else{dot.classList.add('locked');}
+  });
+  // Show current section
+  const sec=document.getElementById('level-section-'+lvl);
+  if(sec) sec.style.display='block';
+  // Render code
+  const q=QUESTIONS[lvl];
+  if(!q) return;
+  // Left: read-only code — no highlighting, plain display
+  const codeEl=document.getElementById('code-display-'+lvl);
+  if(codeEl){
+    codeEl.innerHTML=q.code.map(l=>`<div class="code-line"><span class="line-num">${l.n}</span><span class="line-code">${escHtml(l.code)}</span></div>`).join('');
+  }
+  // Right: pre-fill editor with full code (editable) — team fixes the bug lines
+  const ansEl=document.getElementById('answer-'+lvl);
+  if(ansEl){
+    ansEl.value=q.code.map(l=>l.code).join('\n');
+    ansEl.style.minHeight=Math.max(220, q.code.length*24+60)+'px';
+  }
+  const eoEl=document.getElementById('expected-output-'+lvl);
+  if(eoEl) eoEl.textContent=q.expectedOutput;
+  const descEl=document.getElementById('desc-'+lvl);
+  if(descEl) descEl.textContent=q.description;
+}
+
+function renderHUD(){
+  if(!currentTeam) return;
+  document.getElementById('hud-bugs').textContent=currentTeam.completedLevels?currentTeam.completedLevels.length:0;
+  document.getElementById('hud-lives').textContent=currentTeam.lives>=0?currentTeam.lives:0;
+  document.getElementById('game-score').textContent=currentTeam.score||0;
+  renderLives(currentTeam.lives);
+  if(currentTeam.lives<=1){
+    document.getElementById('hud-lives').className='hud-value danger';
+  }else{
+    document.getElementById('hud-lives').className='hud-value';
+  }
+}
+
+function renderLives(count){
+  const maxLives=2;
+  let html='';
+  for(let i=0;i<maxLives;i++){
+    html+=`<span class="life-icon${i>=(count||0)?' lost':''}">❤️</span>`;
+  }
+  document.getElementById('lives-icons').innerHTML=html;
+}
+
+// =====================================================================
+//  TIMER
+// =====================================================================
+function startGlobalTimer(){
+  stopTimerInterval();
+  if(demoMode||!db){
+    // demo: just start a local 10 min timer
+    if(!eventState.startTime) eventState.startTime=Date.now();
+    timerInterval=setInterval(()=>tickTimer(),1000);
+    return;
+  }
+  db.ref('eventState').once('value',snap=>{
+    if(snap.val()) eventState=snap.val();
+    timerInterval=setInterval(()=>tickTimer(),1000);
+  });
+}
+
+function tickTimer(){
+  if(!eventState.startTime){
+    document.getElementById('hud-timer').textContent='--:--';
+    return;
+  }
+  const lvlDuration = currentLevelKey==='s' ? 2*60*1000 : 10*60*1000;
+  const lvlStart = getLevelStart();
+  const elapsed=(Date.now()-lvlStart)-(eventState.pauseOffset||0);
+  const remaining=Math.max(0,lvlDuration-elapsed);
+  const mins=Math.floor(remaining/60000);
+  const secs=Math.floor((remaining%60000)/1000);
+  const display=`${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+  const timerEl=document.getElementById('hud-timer');
+  if(timerEl){
+    timerEl.textContent=display;
+    timerEl.className='timer-display';
+    if(remaining<60000) timerEl.classList.add('danger');
+    else if(remaining<180000) timerEl.classList.add('warning');
+  }
+  // Update spectator timer
+  const specT=document.getElementById('spec-timer');
+  if(specT) specT.textContent=display;
+  if(remaining===0&&!gracePeriod){
+    handleTimerExpiry();
+  }
+}
+
+function getLevelStart(){
+  // Each level starts when team advances; but global 10 min timer starts with event
+  if(currentTeam&&currentTeam.levelStartTimes&&currentTeam.levelStartTimes[currentLevelKey]){
+    return currentTeam.levelStartTimes[currentLevelKey];
+  }
+  return eventState.startTime||Date.now();
+}
+
+function handleTimerExpiry(){
+  const answerEl=document.getElementById('answer-'+currentLevelKey);
+  const hasAnswer=answerEl&&answerEl.value.trim().length>0;
+  if(hasAnswer&&!gracePeriod){
+    gracePeriod=true;
+    showToast('⏰ Time up! 10-second grace period to submit!','warn');
+    let graceSecs=10;
+    graceTimer=setInterval(()=>{
+      graceSecs--;
+      document.getElementById('hud-timer').textContent='GRACE: '+graceSecs+'s';
+      if(graceSecs<=0){
+        clearInterval(graceTimer);
+        gracePeriod=false;
+        timedOutLevel();
+      }
+    },1000);
+  }else{
+    timedOutLevel();
+  }
+}
+
+function timedOutLevel(){
+  stopTimerInterval();
+  updateTeam({status:'TimedOut',timedOut:true});
+  currentTeam.status='TimedOut';
+  currentTeam.timedOut=true;
+  [1,2,3,'s','over'].forEach(l=>{
+    const el=document.getElementById('level-section-'+l);
+    if(el) el.style.display='none';
+  });
+  document.getElementById('level-section-over').style.display='block';
+  document.getElementById('over-title').textContent='⏰ TIME EXPIRED';
+  document.getElementById('over-msg').textContent=`Your team ran out of time on Level ${currentLevelKey}. Your journey ends here.`;
+  document.getElementById('over-score').textContent=currentTeam.score||0;
+  logActivity(currentTeamId,'timeout','Timed out on level '+currentLevelKey);
+  // Show final leaderboard after 2 sec
+  setTimeout(()=>showFinalLeaderboard(),2000);
+}
+
+function showFinalLeaderboard(){
+  const overlay=document.getElementById('final-lb-overlay');
+  const rows=document.getElementById('final-lb-rows');
+  if(!overlay||!rows) return;
+  const render=teams=>{
+    const sorted=[...teams].sort((a,b)=>{
+      if(a.disqualified&&!b.disqualified) return 1;
+      if(!a.disqualified&&b.disqualified) return -1;
+      return (b.score||0)-(a.score||0);
+    });
+    rows.innerHTML=sorted.map((t,i)=>{
+      const rank=t.disqualified?'DQ':i+1;
+      const isMe=t.teamName===currentTeam.teamName;
+      const colors=['var(--gold)','silver','#cd7f32'];
+      const bg=rank===1?'rgba(255,215,0,0.12)':rank===2?'rgba(192,192,192,0.08)':rank===3?'rgba(205,127,50,0.08)':'rgba(0,20,0,0.6)';
+      const border=rank===1?'var(--gold)':rank===2?'silver':rank===3?'#cd7f32':'var(--border)';
+      return `
+        <div style="background:${bg};border:${isMe?'2px':'1px'} solid ${isMe?'var(--cyan)':border};border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:14px;${isMe?'box-shadow:0 0 20px rgba(0,255,255,0.2);':''}" >
+          <div style="font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:900;min-width:44px;text-align:center;color:${rank<=3?colors[rank-1]:'var(--text-dim)'};">
+            ${rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':t.disqualified?'💀':rank}
+          </div>
+          <div style="flex:1;">
+            <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:700;color:${isMe?'var(--cyan)':'var(--text)'};">
+              ${escHtml(t.teamName)}${t.ultimateDebugger?' 👑':''}${isMe?' ← YOU':''}
+            </div>
+            <div style="font-size:0.72rem;color:var(--text-dim);">${(t.players||[]).join(' & ')}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;color:${rank===1?'var(--gold)':rank<=3?colors[rank-1]:'var(--green)'};">${t.score||0}</div>
+            <div style="font-size:0.65rem;color:var(--text-dim);">L${t.level||1} · ${t.status||''}</div>
+          </div>
+        </div>`;
+    }).join('');
+    overlay.style.display='block';
+  };
+  if(demoMode){render(Object.values(demoTeams));return;}
+  if(db) db.ref('teams').once('value',snap=>render(Object.values(snap.val()||{})));
+}
+
+// Listen for global "show leaderboard" signal from Firebase
+function listenGlobalLeaderboardSignal(){
+  if(demoMode||!db) return;
+  db.ref('eventState').on('value',snap=>{
+    const s=snap.val();
+    if(s&&s.showLeaderboard){
+      setTimeout(()=>showFinalLeaderboard(),1000);
+    }
+  });
+}
+
+function stopTimerInterval(){
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+}
+
+// =====================================================================
+//  ANSWER SUBMISSION
+// =====================================================================
+function submitAnswer(lvl){
+  if(currentTeam.disqualified){showToast('Team is disqualified','error');return;}
+  if(currentTeam.timedOut){showToast('Time expired','error');return;}
+  const answerEl=document.getElementById('answer-'+lvl);
+  const answer=(answerEl?answerEl.value.trim():'');
+  if(!answer){showToast('Enter your fix first!','error');return;}
+  const q=QUESTIONS[lvl];
+  const correct=checkAnswer(answer,q);
+  if(correct){
+    handleCorrect(lvl);
+  }else{
+    handleWrong(lvl,answer);
+  }
+}
+
+function checkAnswer(answer,q){
+  const norm=s=>s.replace(/\s+/g,' ').trim();
+  const submittedLines=answer.split('\n');
+
+  // New multi-bug format
+  if(q.bugLines&&q.answers){
+    let allCorrect=true;
+    for(const lineNum of q.bugLines){
+      const idx=lineNum-1;
+      const submitted=norm(submittedLines[idx]||'');
+      const expected=norm(q.answers[lineNum]||'');
+      const alts=(q.altAnswers&&q.altAnswers[lineNum])||[];
+      const match=submitted===expected||alts.some(a=>norm(a)===submitted);
+      if(!match){allCorrect=false;break;}
+    }
+    if(allCorrect) return true;
+    // Also allow single-line submission matching the primary answer set
+    const single=norm(answer);
+    const allAnswers=Object.values(q.answers||{});
+    if(allAnswers.some(a=>norm(a)===single)) return true;
+    return false;
+  }
+
+  // Legacy single-bug format
+  const na=norm(answer);
+  if(na===norm(q.answer||'')) return true;
+  if(q.altAnswers&&Array.isArray(q.altAnswers)){
+    if(q.altAnswers.some(a=>na===norm(a))) return true;
+  }
+  if(q.realAnswer&&na===norm(q.realAnswer)) return true;
+  return false;
+}
+
+function handleCorrect(lvl){
+  stopTimerInterval();
+  // Calculate bonus
+  const bonusPts=getBonusPoints(lvl);
+  const lvlPts={1:100,2:200,3:300,s:150}[lvl]||100;
+  const totalAdd=lvlPts+bonusPts;
+  currentTeam.score=(currentTeam.score||0)+totalAdd;
+  currentTeam.completedLevels=currentTeam.completedLevels||[];
+  currentTeam.completedLevels.push(lvl);
+  currentTeam.lives=2; // reset lives for next level
+  // Determine next level
+  let nextLvl=null;
+  if(lvl===1) nextLvl=2;
+  else if(lvl===2) nextLvl=3;
+  else if(lvl===3){nextLvl='s';currentTeam.secretUnlocked=true;}
+  else if(lvl==='s'){
+    // Secret level completed!
+    handleSecretLevelComplete();
+    return;
+  }
+  currentTeam.level=nextLvl;
+  const now=Date.now();
+  currentTeam.levelStartTimes=currentTeam.levelStartTimes||{};
+  currentTeam.levelStartTimes[nextLvl]=now;
+  updateTeam({
+    score:currentTeam.score,
+    level:nextLvl,
+    lives:2,
+    completedLevels:currentTeam.completedLevels,
+    secretUnlocked:currentTeam.secretUnlocked||false,
+    levelStartTimes:currentTeam.levelStartTimes
+  });
+  logActivity(currentTeamId,'level_complete','Completed level '+lvl+' +'+totalAdd+' pts');
+  // Show success
+  const msg=getRand(SUCCESS_MSGS)+`\n+${totalAdd} points!`+(bonusPts>0?` (includes +${bonusPts} finish bonus!)`:'');
+  showModal('🎉','LEVEL CLEARED!',msg,[
+    {label:'NEXT LEVEL →',action:()=>{
+      closeModal();
+      currentLevelKey=nextLvl;
+      renderGameLevel(nextLvl);
+      renderHUD();
+      startGlobalTimer();
+    },cls:'btn-green'}
+  ],'gold');
+}
+
+function getBonusPoints(lvl){
+  // Count teams that completed this level
+  if(demoMode){
+    const completedCount=Object.values(demoTeams).filter(t=>t.completedLevels&&t.completedLevels.includes(lvl)).length;
+    if(completedCount===0) return 50;
+    if(completedCount===1) return 25;
+    if(completedCount===2) return 10;
+    return 0;
+  }
+  // Async would be ideal but for simplicity:
+  return 0; // Will be handled via Firebase on actual use
+}
+
+function handleWrong(lvl,answer){
+  currentTeam.lives=Math.max(0,(currentTeam.lives||2)-1);
+  if(currentTeam.lives<=0){
+    updateTeam({lives:0,status:'Game Over'});
+    currentTeam.status='Game Over';
+    logActivity(currentTeamId,'game_over','Out of lives on level '+lvl);
+    showModal('💀','GAME OVER',getRand(FAIL_MSGS)+'\n\nYou ran out of lives on Level '+lvl+'!',[
+      {label:'VIEW LEADERBOARD',action:()=>{closeModal();openPanel('panel-leaderboard','right');loadLeaderboard();},cls:'btn-cyan'}
+    ],'danger');
+    // Show game over screen after modal close
+    document.getElementById('level-section-over').style.display='none';
+    setTimeout(()=>{
+      [1,2,3,'s'].forEach(l=>{
+        const el=document.getElementById('level-section-'+l);
+        if(el) el.style.display='none';
+      });
+      document.getElementById('level-section-over').style.display='block';
+      document.getElementById('over-title').textContent='💀 GAME OVER';
+      document.getElementById('over-msg').textContent='You ran out of lives on Level '+lvl+'. Better luck next time!';
+      document.getElementById('over-score').textContent=currentTeam.score||0;
+    },3000);
+    return;
+  }
+  updateTeam({lives:currentTeam.lives});
+  renderHUD();
+  logActivity(currentTeamId,'wrong_answer','Wrong answer on level '+lvl+', lives left: '+currentTeam.lives);
+  showToast(getRand(FAIL_MSGS),'error');
+  // Add to override queue
+  const req={
+    id:'ovr_'+Date.now(),
+    teamId:currentTeamId,
+    teamName:currentTeam.teamName,
+    level:lvl,
+    submission:answer,
+    timestamp:Date.now(),
+    resolved:false
+  };
+  if(!demoMode&&db) db.ref('overrideQueue/'+req.id).set(req);
+  else overrideQueue.push(req);
+}
+
+function handleSecretLevelComplete(){
+  const pts=(currentTeam.score||0)+500;
+  currentTeam.score=pts;
+  currentTeam.status='Completed';
+  currentTeam.ultimateDebugger=true;
+  updateTeam({score:pts,status:'Completed',ultimateDebugger:true});
+  if(!demoMode&&db) db.ref('winner').set({teamId:currentTeamId,teamName:currentTeam.teamName,players:currentTeam.players,score:pts});
+  logActivity(currentTeamId,'secret_complete','SECRET LEVEL COMPLETED! ULTIMATE DEBUGGER!');
+  stopTimerInterval();
+  // Show winner screen
+  document.getElementById('winner-name').textContent=currentTeam.teamName;
+  document.getElementById('winner-players').textContent=currentTeam.players.join(' & ');
+  document.getElementById('winner-score').textContent=pts+' POINTS';
+  document.getElementById('winner-screen').classList.add('show');
+  spawnConfetti();
+}
+
+// =====================================================================
+//  LEVEL LISTENERS
+// =====================================================================
+function listenTeamUpdates(){
+  if(demoMode||!db) return;
+  db.ref('teams/'+currentTeamId).on('value',snap=>{
+    if(!snap.val()) return;
+    const updated=snap.val();
+    if(updated.disqualified&&!currentTeam.disqualified){
+      currentTeam.disqualified=true;
+      stopTimerInterval();
+      showModal('💀','DISQUALIFIED','Your team has been disqualified by admin.\n\nReason: Violation of competition rules.',[
+        {label:'OK',action:closeModal,cls:'btn-red'}
+      ],'danger');
+    }
+    currentTeam=updated;
+    renderHUD();
+  });
+}
+
+function listenRankUpdate(){
+  if(demoMode||!db) return;
+  db.ref('teams').on('value',snap=>{
+    const teams=snap.val()||{};
+    const sorted=Object.values(teams).filter(t=>!t.disqualified).sort((a,b)=>(b.score||0)-(a.score||0));
+    const myRank=sorted.findIndex(t=>t.teamName===currentTeam.teamName)+1;
+    document.getElementById('hud-rank').textContent='#'+myRank;
+  });
+}
+
+// =====================================================================
+//  SAMPLE OUTPUT REVEAL
+// =====================================================================
+function revealSample(lvl){
+  const reveals=sampleReveals[lvl]||0;
+  if(reveals>=2){
+    showToast('Sample output already used 2/2 times!','warn');
+    return;
+  }
+  sampleReveals[lvl]=(reveals+1);
+  if(currentTeam) currentTeam.sampleReveals=sampleReveals;
+  updateTeam({sampleReveals});
+  const el=document.getElementById('sample-output-'+lvl);
+  const badge=document.getElementById('sample-count-'+lvl);
+  if(badge) badge.textContent='('+sampleReveals[lvl]+'/2)';
+  if(!el) return;
+  // Show with countdown
+  el.style.display='block';
+  let secs=6;
+  const countEl=document.createElement('div');
+  countEl.style.cssText='font-size:0.7rem;color:var(--text-dim);text-align:right;margin-top:6px;font-family:"Orbitron",monospace;';
+  countEl.textContent='Auto-closing in '+secs+'s…';
+  el.appendChild(countEl);
+  const tick=setInterval(()=>{
+    secs--;
+    if(secs>0){countEl.textContent='Auto-closing in '+secs+'s…';}
+    else{
+      clearInterval(tick);
+      el.style.display='none';
+      el.removeChild(countEl);
+    }
+  },1000);
+  showToast('Sample shown — closes in 6s ('+sampleReveals[lvl]+'/2 uses)', sampleReveals[lvl]>=2?'warn':'info');
+}
+
+// =====================================================================
+//  ANTI-CHEAT
+// =====================================================================
+function blockPaste(e){
+  if(eventState.status!=='running') return;
+  e.preventDefault();
+  showToast(getRand(VIOLATION_MSGS),'error');
+  recordViolation('paste');
+}
+function blockCopy(e){
+  if(eventState.status!=='running') return;
+  e.preventDefault();
+  showToast(getRand(VIOLATION_MSGS),'error');
+}
+function blockCut(e){
+  if(eventState.status!=='running') return;
+  e.preventDefault();
+  showToast(getRand(VIOLATION_MSGS),'error');
+}
+
+document.addEventListener('keydown',e=>{
+  if(eventState.status!=='running') return;
+  if((e.ctrlKey||e.metaKey)&&['c','v','x'].includes(e.key.toLowerCase())){
+    const activeEl=document.activeElement;
+    if(activeEl&&activeEl.classList.contains('answer-editor')){
+      e.preventDefault();
+      showToast(getRand(VIOLATION_MSGS),'error');
+      recordViolation('keyboard_shortcut');
+    }
+  }
+});
+
+document.addEventListener('visibilitychange',()=>{
+  if(eventState.status!=='running') return;
+  if(!currentTeamId||adminLoggedIn) return;
+  if(document.hidden&&document.getElementById('game-page').classList.contains('active')){
+    tabSwitchCount++;
+    recordViolation('tab_switch');
+  }
+});
+
+function recordViolation(type){
+  if(!currentTeamId||!currentTeam) return;
+  violationCount++;
+  const penalty=5;
+  currentTeam.score=Math.max(0,(currentTeam.score||0)-penalty);
+  currentTeam.warnings=(currentTeam.warnings||0)+1;
+  updateTeam({score:currentTeam.score,warnings:currentTeam.warnings});
+  logActivity(currentTeamId,'violation',type+' — warning #'+currentTeam.warnings+' -'+penalty+' pts');
+  if(currentTeam.warnings>=2){
+    disqualifyTeam(currentTeamId,'Multiple violations: '+type);
+  }else{
+    showToast(`⚠️ WARNING ${currentTeam.warnings}/2: -${penalty} pts. ${currentTeam.warnings===1?'Next violation = DQ!':''}`, 'warn');
+  }
+  renderHUD();
+}
+
+// Refresh counting removed — no DQ on refresh
+window.addEventListener('beforeunload',()=>{
+  // No action on refresh — DQ on refresh disabled
+});
+
+function checkRefreshCount(){
+  // DQ on refresh disabled — no action
+}
+
+function disqualifyTeam(teamId,reason){
+  const update={disqualified:true,status:'Disqualified',disqualifyReason:reason};
+  if(demoMode&&demoTeams[teamId]){Object.assign(demoTeams[teamId],update);}
+  else if(db) db.ref('teams/'+teamId).update(update);
+  if(teamId===currentTeamId){
+    currentTeam=Object.assign(currentTeam||{},update);
+    stopTimerInterval();
+    showModal('💀','DISQUALIFIED',`Your team has been disqualified!\nReason: ${reason}`,[
+      {label:'VIEW LEADERBOARD',action:()=>{closeModal();openPanel('panel-leaderboard','right');loadLeaderboard();},cls:'btn-red'}
+    ],'danger');
+  }
+  logActivity(teamId,'disqualified',reason);
+}
+
+// =====================================================================
+//  ADMIN PANEL
+// =====================================================================
+function openAdminLogin(){
+  document.getElementById('admin-login-overlay').classList.add('show');
+  setTimeout(()=>document.getElementById('admin-pw-input').focus(),100);
+}
+function closeAdminLogin(){
+  document.getElementById('admin-login-overlay').classList.remove('show');
+  document.getElementById('admin-pw-input').value='';
+  document.getElementById('admin-pw-error').style.display='none';
+}
+function checkAdminLogin(){
+  const pw=document.getElementById('admin-pw-input').value;
+  if(pw==='zenvishwa'){
+    closeAdminLogin();
+    adminLoggedIn=true;
+    showPage('admin-page');
+    showNavBtn('nav-admin');
+    loadAdminTeams();
+    loadAdminOverrides();
+    loadHelpRequests();
+    loadActivityLog();
+    loadAdminLeaderboard();
+    listenAdminData();
+    startAdminCountdown();
+    updateAdminEventStatus();
+    showToast('Admin access granted','success');
+  }else{
+    document.getElementById('admin-pw-error').style.display='block';
+    document.getElementById('admin-pw-input').value='';
+  }
+}
+
+function updateAdminEventStatus(){
+  const s=eventState.status||'standby';
+  const el=document.getElementById('admin-event-status-big');
+  if(!el) return;
+  const map={
+    standby:{text:'⏳ STANDBY',bg:'rgba(255,165,0,0.15)',border:'orange',color:'orange'},
+    running:{text:'⚡ RUNNING',bg:'rgba(0,255,65,0.15)',border:'var(--green)',color:'var(--green)'},
+    paused:{text:'⏸ PAUSED',bg:'rgba(255,165,0,0.15)',border:'var(--orange)',color:'var(--orange)'},
+    stopped:{text:'🛑 ENDED',bg:'rgba(255,0,64,0.15)',border:'var(--red)',color:'var(--red)'},
+  };
+  const m=map[s]||map.standby;
+  el.textContent=m.text;
+  el.style.background=m.bg;
+  el.style.borderColor=m.border;
+  el.style.color=m.color;
+  // old hidden badge (JS uses it)
+  const old=document.getElementById('admin-event-status');
+  if(old){old.textContent='EVENT: '+s.toUpperCase();}
+}
+
+function listenAdminData(){
+  if(demoMode||!db) return;
+  // Event state realtime
+  db.ref('eventState').on('value',snap=>{
+    if(snap.val()){eventState=snap.val();updateAdminEventStatus();}
+  });
+  db.ref('teams').on('value',snap=>{
+    const data=snap.val()||{};
+    const count=Object.keys(data).length;
+    const el=document.getElementById('admin-teams-online');
+    if(el) el.textContent='Teams: '+count;
+    setBadge('teams',count);
+    loadAdminTeams();
+    loadAdminLeaderboard();
+  });
+  db.ref('overrideQueue').on('value',snap=>{
+    overrideQueue=snap.val()?Object.values(snap.val()).filter(o=>!o.resolved):[];
+    setBadge('overrides',overrideQueue.length);
+    loadAdminOverrides();
+  });
+  db.ref('helpRequests').on('value',snap=>{
+    helpRequests=snap.val()?Object.values(snap.val()).filter(h=>!h.resolved):[];
+    setBadge('help',helpRequests.length);
+    loadHelpRequests();
+  });
+  db.ref('activityLogs').on('value',snap=>{
+    const count=snap.val()?Object.keys(snap.val()).length:0;
+    setBadge('logs',count);
+    loadActivityLog();
+  });
+}
+
+function setBadge(tab,count){
+  const el=document.getElementById('badge-'+tab);
+  if(!el) return;
+  if(count>0){el.textContent=count;el.style.display='inline';}
+  else{el.style.display='none';}
+}
+
+function adminSwitchTab(tab){
+  const tabs=['teams','lb','overrides','help','logs','codeedit'];
+  tabs.forEach(t=>{
+    // sidebar nav buttons
+    const navBtn=document.getElementById('anav-'+t);
+    if(navBtn) navBtn.className='admin-nav-btn'+(t===tab?' active':'');
+    // content panels
+    const content=document.getElementById('atab-content-'+t);
+    if(content) content.style.display=(t===tab)?'block':'none';
+  });
+  if(tab==='lb') loadAdminLeaderboard();
+  else if(tab==='overrides') loadAdminOverrides();
+  else if(tab==='help') loadHelpRequests();
+  else if(tab==='logs') loadActivityLog();
+  else if(tab==='codeedit') adminLoadCodeEditor();
+  else loadAdminTeams();
+}
+
+function adminLoadCodeEditor(){
+  const lvl=document.getElementById('codeedit-level').value;
+  const q=QUESTIONS[lvl];
+  if(!q) return;
+  // Render lines
+  const container=document.getElementById('codeedit-lines');
+  container.innerHTML=q.code.map((l,idx)=>`
+    <div style="display:flex;align-items:center;gap:8px;background:${l.bug?'rgba(255,0,64,0.1)':'rgba(0,20,0,0.6)'};border:1px solid ${l.bug?'var(--red)':'rgba(0,255,65,0.1)'};border-radius:4px;padding:4px 8px;">
+      <span style="color:rgba(0,255,65,0.4);min-width:22px;text-align:right;font-family:'Share Tech Mono',monospace;font-size:0.75rem;">${l.n}</span>
+      <input type="text" id="celine-${idx}" value="${l.code.replace(/"/g,'&quot;')}" style="flex:1;background:transparent;border:none;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;padding:2px 4px;">
+      <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:0.72rem;color:var(--red);white-space:nowrap;">
+        <input type="checkbox" id="cebug-${idx}" ${l.bug?'checked':''} style="accent-color:var(--red);width:14px;height:14px;cursor:pointer;">
+        BUG
+      </label>
+    </div>
+  `).join('');
+  document.getElementById('codeedit-expected').value=q.expectedOutput||'';
+  document.getElementById('codeedit-desc').value=q.description||'';
+  // Add live bug highlight on checkbox change
+  q.code.forEach((_,idx)=>{
+    const cb=document.getElementById('cebug-'+idx);
+    const row=cb&&cb.closest('div');
+    if(cb&&row){
+      cb.addEventListener('change',()=>{
+        row.style.background=cb.checked?'rgba(255,0,64,0.1)':'rgba(0,20,0,0.6)';
+        row.style.borderColor=cb.checked?'var(--red)':'rgba(0,255,65,0.1)';
+      });
+    }
+  });
+  const status=document.getElementById('codeedit-status');
+  status.style.display='none';
+}
+
+function adminSaveCodeEditor(){
+  const lvl=document.getElementById('codeedit-level').value;
+  const q=QUESTIONS[lvl];
+  if(!q) return;
+  // Read lines back
+  const newCode=q.code.map((l,idx)=>{
+    const inp=document.getElementById('celine-'+idx);
+    const cb=document.getElementById('cebug-'+idx);
+    const code=inp?inp.value:l.code;
+    const bug=cb?cb.checked:false;
+    return {n:l.n, code, ...(bug?{bug:true}:{})};
+  });
+  // Extract bug lines
+  const bugLines=newCode.filter(l=>l.bug).map(l=>l.n);
+  QUESTIONS[lvl].code=newCode;
+  QUESTIONS[lvl].bugLines=bugLines;
+  QUESTIONS[lvl].expectedOutput=document.getElementById('codeedit-expected').value;
+  QUESTIONS[lvl].description=document.getElementById('codeedit-desc').value;
+  // Reload display if this level is currently active
+  if(currentLevelKey==lvl||currentLevelKey===lvl){
+    const codeEl=document.getElementById('code-display-'+lvl);
+    if(codeEl){
+      codeEl.innerHTML=newCode.map(l=>`<div class="code-line"><span class="line-num">${l.n}</span><span class="line-code">${escHtml(l.code)}</span></div>`).join('');
+    }
+    const ansEl=document.getElementById('answer-'+lvl);
+    if(ansEl) ansEl.value=newCode.map(l=>l.code).join('\n');
+  }
+  const status=document.getElementById('codeedit-status');
+  status.textContent='✅ Saved & applied to Level '+lvl+'!';
+  status.style.display='block';
+  logActivity('admin','code_edit','Admin edited Level '+lvl+' code');
+  setTimeout(()=>{ status.style.display='none'; },3000);
+}
+
+function adminStartEvent(){
+  const now=Date.now();
+  const newState={status:'running',startTime:now,pausedAt:null,pauseOffset:0};
+  if(demoMode){
+    eventState=newState;
+    updateAdminEventStatus();
+    showToast('▶ Event started!','success');
+    return;
+  }
+  db.ref('eventState').set(newState).then(()=>{
+    eventState=newState;
+    updateAdminEventStatus();
+    showToast('▶ Event started!','success');
+    logActivity('admin','event_start','Event started at '+new Date(now).toLocaleTimeString());
+  }).catch(e=>showToast('Error: '+e.message,'error'));
+}
+
+function adminPauseEvent(){
+  const newState={...eventState,status:'paused',pausedAt:Date.now()};
+  if(demoMode){eventState=newState;updateAdminEventStatus();showToast('⏸ Event paused','warn');return;}
+  db.ref('eventState').set(newState).then(()=>{
+    eventState=newState;
+    updateAdminEventStatus();
+    showToast('⏸ Event paused','warn');
+    logActivity('admin','event_pause','Event paused');
+  }).catch(e=>showToast('Error: '+e.message,'error'));
+}
+
+function adminResumeEvent(){
+  const now=Date.now();
+  const additionalOffset=eventState.pausedAt?now-eventState.pausedAt:0;
+  const newState={...eventState,status:'running',pausedAt:null,pauseOffset:(eventState.pauseOffset||0)+additionalOffset};
+  if(demoMode){eventState=newState;updateAdminEventStatus();showToast('▶ Event resumed','success');return;}
+  db.ref('eventState').set(newState).then(()=>{
+    eventState=newState;
+    updateAdminEventStatus();
+    showToast('▶ Event resumed','success');
+    logActivity('admin','event_resume','Event resumed');
+  }).catch(e=>showToast('Error: '+e.message,'error'));
+}
+
+function adminStopEvent(){
+  const newState={...eventState,status:'stopped',showLeaderboard:true};
+  if(demoMode){eventState=newState;updateAdminEventStatus();showToast('⏹ Event stopped','info');return;}
+  db.ref('eventState').set(newState).then(()=>{
+    eventState=newState;
+    updateAdminEventStatus();
+    showToast('⏹ Event stopped — leaderboard sent to all teams!','info');
+    logActivity('admin','event_stop','Event stopped + leaderboard broadcast');
+  }).catch(e=>showToast('Error: '+e.message,'error'));
+}
+
+function adminResetEvent(){
+  if(!confirm('⚠️ RESET ALL? Deletes ALL teams, scores, logs. Cannot be undone!')) return;
+  const resetState={status:'standby',startTime:null,pausedAt:null,pauseOffset:0};
+  if(demoMode){
+    eventState=resetState;demoTeams={};overrideQueue=[];helpRequests=[];
+    updateAdminEventStatus();loadAdminTeams();
+    showToast('🔄 Reset done (demo)','warn');return;
+  }
+  Promise.all([
+    db.ref('teams').remove(),
+    db.ref('eventState').set(resetState),
+    db.ref('overrideQueue').remove(),
+    db.ref('helpRequests').remove(),
+    db.ref('activityLogs').remove(),
+    db.ref('winner').remove()
+  ]).then(()=>{
+    eventState=resetState;
+    updateAdminEventStatus();
+    document.getElementById('admin-countdown').textContent='--:--';
+    loadAdminTeams();
+    showToast('🔄 Event fully reset!','warn');
+  }).catch(e=>showToast('Reset error: '+e.message,'error'));
+}
+
+let adminTimerInterval=null;
+function startAdminCountdown(){
+  if(adminTimerInterval) clearInterval(adminTimerInterval);
+  // Fetch fresh eventState from Firebase first
+  if(!demoMode&&db){
+    db.ref('eventState').once('value',snap=>{
+      if(snap.val()) eventState=snap.val();
+      updateAdminEventStatus();
+      _runAdminTick();
+    });
+  } else {
+    updateAdminEventStatus();
+    _runAdminTick();
+  }
+}
+function _runAdminTick(){
+  adminTimerInterval=setInterval(()=>{
+    const el=document.getElementById('admin-countdown');
+    if(!el) return;
+    if(eventState.status==='paused'){el.textContent='PAUSED';el.style.color='var(--orange)';return;}
+    if(eventState.status!=='running'||!eventState.startTime){el.textContent='--:--';el.style.color='var(--text-dim)';return;}
+    const totalDur=10*60*1000;
+    const elapsed=(Date.now()-eventState.startTime)-(eventState.pauseOffset||0);
+    const remaining=Math.max(0,totalDur-elapsed);
+    const mins=Math.floor(remaining/60000);
+    const secs=Math.floor((remaining%60000)/1000);
+    el.textContent=`${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    el.style.color=remaining<60000?'var(--red)':remaining<180000?'var(--orange)':'var(--green)';
+  },1000);
+}
+
+function clearActivityLog(){
+  if(!confirm('Clear all activity logs?')) return;
+  document.getElementById('activity-log').innerHTML='<div style="color:var(--text-dim);font-size:0.8rem;">Log cleared</div>';
+  if(!demoMode&&db) db.ref('activityLogs').remove();
+}
+
+function loadAdminTeams(){
+  const tbody=document.getElementById('admin-teams-tbody');
+  if(!tbody) return;
+  const filterVal=(document.getElementById('team-filter')||{value:'all'}).value||'all';
+  const render=teamsObj=>{
+    const allTeams=Object.entries(teamsObj||{});
+    // Summary pills
+    const summary=document.getElementById('admin-team-summary');
+    if(summary){
+      const counts={Waiting:0,Ready:0,'In Progress':0,Completed:0,Disqualified:0,TimedOut:0,'Game Over':0};
+      allTeams.forEach(([,t])=>{const s=t.status||'Waiting';if(counts[s]!==undefined)counts[s]++;});
+      summary.innerHTML=Object.entries(counts).map(([s,n])=>n>0?`<span class="status-badge ${getStatusClass(s)}" style="font-size:0.6rem;cursor:default;">${getStatusIcon(s)} ${s}: <b>${n}</b></span>`:''  ).join('');
+    }
+    // Filter
+    const teams=filterVal==='all'?allTeams:allTeams.filter(([,t])=>(t.status||'Waiting')===filterVal);
+    if(!teams.length){tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;color:var(--text-dim);padding:20px;">No teams${filterVal!=='all'?' with status: '+filterVal:''}</td></tr>`;return;}
+    tbody.innerHTML=teams.map(([id,t],idx)=>`
+      <tr style="${t.disqualified?'opacity:0.5;':''}">
+        <td style="color:var(--text-dim);font-size:0.75rem;">${idx+1}</td>
+        <td><b style="font-family:'Orbitron',monospace;font-size:0.8rem;">${escHtml(t.teamName)}</b>${t.ultimateDebugger?'<span style="color:var(--gold);margin-left:4px;">👑</span>':''}</td>
+        <td style="font-size:0.78rem;color:var(--text-dim);">${(t.players||[]).join('<br>')}</td>
+        <td style="color:var(--green);font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;">${t.score||0}</td>
+        <td style="font-family:'Orbitron',monospace;font-size:0.8rem;">L${t.level||1}</td>
+        <td>${renderLivesAdmin(t.lives)}</td>
+        <td><span class="status-badge ${getStatusClass(t.status)}" style="font-size:0.62rem;">${getStatusIcon(t.status)} ${t.status||'Waiting'}</span></td>
+        <td style="text-align:center;">${t.warnings>0?`<span style="color:${t.warnings>=2?'var(--red)':'var(--orange)'};font-family:'Orbitron',monospace;font-size:0.8rem;">⚠️${t.warnings}</span>`:'<span style="color:var(--text-dim);font-size:0.75rem;">—</span>'}</td>
+        <td>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
+            ${!t.disqualified?`<button class="btn btn-red btn-sm" style="font-size:0.55rem;padding:4px 8px;" onclick="adminDQ('${id}','${escHtml(t.teamName)}')">💀 DQ</button>`:''}
+            ${t.disqualified?`<button class="btn btn-green btn-sm" style="font-size:0.55rem;padding:4px 8px;" onclick="adminReinstate('${id}')">↩ RESTORE</button>`:''}
+            <button class="btn btn-sm" style="font-size:0.55rem;padding:4px 8px;color:var(--orange);border-color:var(--orange);" onclick="adminResetTeam('${id}')">🔄</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  };
+  if(demoMode){render(demoTeams);return;}
+  db.ref('teams').once('value',snap=>render(snap.val()||{}));
+}
+
+function adminDQ(teamId,teamName){
+  if(!confirm(`Disqualify team "${teamName}"?`)) return;
+  disqualifyTeam(teamId,'Manual disqualification by admin');
+  loadAdminTeams();
+}
+function adminReinstate(teamId){
+  const update={disqualified:false,status:'In Progress',disqualifyReason:null};
+  if(demoMode&&demoTeams[teamId]) Object.assign(demoTeams[teamId],update);
+  else if(db) db.ref('teams/'+teamId).update(update);
+  logActivity(teamId,'reinstate','Team reinstated by admin');
+  loadAdminTeams();
+  showToast('Team reinstated','success');
+}
+
+function loadAdminOverrides(){
+  const el=document.getElementById('override-list');
+  if(!el) return;
+  if(!overrideQueue||!overrideQueue.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.8rem;">No pending overrides</div>';return;}
+  el.innerHTML=overrideQueue.map(o=>`
+    <div class="override-item">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="color:var(--cyan);font-size:0.8rem;font-weight:700;">${escHtml(o.teamName)}</span>
+        <span style="color:var(--text-dim);font-size:0.7rem;">Level ${o.level}</span>
+      </div>
+      <div class="sub-code">${escHtml(o.submission)}</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-green btn-sm" onclick="approveOverride('${o.id}','${escHtml(o.teamName)}',${o.level})">✅ APPROVE</button>
+        <button class="btn btn-red btn-sm" onclick="rejectOverride('${o.id}')">❌ REJECT</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function approveOverride(id,teamName,lvl){
+  // Find team and credit points
+  const lvlPts={1:100,2:200,3:300,s:150}[lvl]||100;
+  if(!demoMode&&db){
+    db.ref('teams').orderByChild('teamName').equalTo(teamName).once('value',snap=>{
+      const teams=snap.val()||{};
+      Object.entries(teams).forEach(([tid,t])=>{
+        const newScore=(t.score||0)+lvlPts;
+        const completed=[...(t.completedLevels||[]),lvl];
+        db.ref('teams/'+tid).update({score:newScore,completedLevels:completed});
+      });
+    });
+    db.ref('overrideQueue/'+id).update({resolved:true});
+  }
+  overrideQueue=overrideQueue.filter(o=>o.id!==id);
+  loadAdminOverrides();
+  logActivity('admin','override_approve','Approved submission for '+teamName+' level '+lvl);
+  showToast('Answer approved for '+teamName,'success');
+}
+function rejectOverride(id){
+  if(!demoMode&&db) db.ref('overrideQueue/'+id).update({resolved:true});
+  overrideQueue=overrideQueue.filter(o=>o.id!==id);
+  loadAdminOverrides();
+  showToast('Submission rejected','info');
+}
+
+function loadHelpRequests(){
+  const el=document.getElementById('help-requests-list');
+  if(!el) return;
+  if(!helpRequests||!helpRequests.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.8rem;">No pending requests</div>';return;}
+  el.innerHTML=helpRequests.map(h=>`
+    <div class="help-req-item">
+      <div class="help-req-info">
+        <div class="help-req-team">${escHtml(h.teamName||'Unknown')}</div>
+        <div style="font-size:0.75rem;color:var(--text-dim);">${escHtml(h.playerName||'')} • ${new Date(h.timestamp).toLocaleTimeString()}</div>
+      </div>
+      <button class="btn btn-green btn-sm" onclick="resolveHelp('${h.id}')">RESOLVE</button>
+    </div>
+  `).join('');
+}
+function resolveHelp(id){
+  if(!demoMode&&db) db.ref('helpRequests/'+id).update({resolved:true});
+  helpRequests=helpRequests.filter(h=>h.id!==id);
+  loadHelpRequests();
+  showToast('Help request resolved','success');
+}
+
+function loadActivityLog(){
+  const el=document.getElementById('activity-log');
+  if(!el) return;
+  if(demoMode){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;padding:8px;">Demo mode — logs not saved</div>';return;}
+  db.ref('activityLogs').orderByChild('timestamp').limitToLast(100).once('value',snap=>{
+    const logs=snap.val()||{};
+    const sorted=Object.values(logs).sort((a,b)=>b.timestamp-a.timestamp);
+    if(!sorted.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;padding:8px;">No activity yet</div>';return;}
+    const actionMeta={
+      registration:{icon:'📝',color:'var(--cyan)'},
+      level_complete:{icon:'✅',color:'var(--green)'},
+      wrong_answer:{icon:'❌',color:'var(--red)'},
+      violation:{icon:'⚠️',color:'var(--orange)'},
+      disqualified:{icon:'💀',color:'var(--red)'},
+      reinstate:{icon:'↩',color:'var(--green)'},
+      timeout:{icon:'⏰',color:'#f44'},
+      game_over:{icon:'💥',color:'var(--red)'},
+      help_request:{icon:'🆘',color:'var(--orange)'},
+      event_start:{icon:'▶',color:'var(--green)'},
+      event_pause:{icon:'⏸',color:'var(--orange)'},
+      event_resume:{icon:'▶',color:'var(--cyan)'},
+      event_stop:{icon:'⏹',color:'var(--red)'},
+      reset:{icon:'🔄',color:'#ff44aa'},
+      team_reset:{icon:'🔄',color:'var(--orange)'},
+      announcement:{icon:'📢',color:'var(--cyan)'},
+      secret_complete:{icon:'👑',color:'var(--gold)'},
+    };
+    el.innerHTML=sorted.map(l=>{
+      const meta=actionMeta[l.action]||{icon:'•',color:'var(--text-dim)'};
+      return `
+        <div class="log-entry" style="border-bottom:1px solid rgba(0,255,65,0.06);padding:6px 8px;">
+          <span class="log-time" style="color:var(--text-dim);min-width:72px;font-size:0.7rem;">${new Date(l.timestamp).toLocaleTimeString()}</span>
+          <span style="font-size:0.9rem;">${meta.icon}</span>
+          <span class="log-team" style="color:var(--cyan);font-size:0.75rem;min-width:80px;max-width:100px;overflow:hidden;text-overflow:ellipsis;">${escHtml((l.teamId||'').replace('team_','T-').substring(0,12))}</span>
+          <span style="color:${meta.color};font-family:'Orbitron',monospace;font-size:0.65rem;min-width:80px;">${escHtml(l.action||'')}</span>
+          <span class="log-action" style="color:var(--text);font-size:0.75rem;flex:1;">${escHtml(l.details||'')}</span>
+        </div>
+      `;
+    }).join('');
+  });
+}
+
+function loadAdminLeaderboard(){
+  const el=document.getElementById('admin-lb-preview');
+  if(!el) return;
+  const render=teams=>{
+    const sorted=teams.filter(t=>!t.disqualified).sort((a,b)=>(b.score||0)-(a.score||0));
+    const dqd=teams.filter(t=>t.disqualified);
+    const all=[...sorted,...dqd];
+    if(!all.length){el.innerHTML='<div style="color:var(--text-dim);text-align:center;padding:30px;">No teams yet</div>';return;}
+    el.innerHTML=all.map((t,i)=>{
+      const rank=t.disqualified?'DQ':i+1;
+      const rankColor=rank===1?'var(--gold)':rank===2?'silver':rank===3?'#cd7f32':'var(--text-dim)';
+      return `
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(0,255,65,0.08);${t.disqualified?'opacity:0.45;':i<3?'background:rgba(255,215,0,0.03);':''}">
+          <span style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;min-width:32px;color:${rankColor};">${rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank}</span>
+          <div style="flex:1;">
+            <div style="font-family:'Orbitron',monospace;font-size:0.82rem;font-weight:700;">${escHtml(t.teamName)}${t.ultimateDebugger?'<span style="color:var(--gold);margin-left:4px;">👑</span>':''}</div>
+            <div style="font-size:0.7rem;color:var(--text-dim);">${(t.players||[]).join(' & ')}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--green);font-weight:900;">${t.score||0}</div>
+            <div style="font-size:0.65rem;color:var(--text-dim);">L${t.level||1}</div>
+          </div>
+          <span class="status-badge ${getStatusClass(t.status)}" style="font-size:0.6rem;">${getStatusIcon(t.status)} ${t.status||'Waiting'}</span>
+        </div>
+      `;
+    }).join('');
+    const upd=document.getElementById('admin-lb-update');
+    if(upd) upd.textContent='Updated '+new Date().toLocaleTimeString();
+  };
+  if(demoMode){render(Object.values(demoTeams));return;}
+  db.ref('teams').on('value',snap=>render(Object.values(snap.val()||{})));
+}
+
+function sendAnnouncement(){
+  const text=document.getElementById('announcement-input').value.trim();
+  if(!text){showToast('Enter announcement text','error');return;}
+  if(!demoMode&&db){
+    db.ref('announcement').set({text,timestamp:Date.now()});
+  }
+  showAnnouncementBanner(text);
+  document.getElementById('announcement-input').value='';
+  logActivity('admin','announcement',text);
+  showToast('Announcement sent!','success');
+}
+
+// =====================================================================
+//  LEADERBOARD
+// =====================================================================
+function loadLeaderboard(){
+  const el=document.getElementById('leaderboard-rows');
+  if(!el) return;
+  const render=teams=>{
+    const sorted=teams.sort((a,b)=>{
+      if(a.disqualified&&!b.disqualified) return 1;
+      if(!a.disqualified&&b.disqualified) return -1;
+      return (b.score||0)-(a.score||0);
+    });
+    if(!sorted.length){el.innerHTML='<div style="text-align:center;color:var(--text-dim);padding:40px;">No teams yet</div>';return;}
+    el.innerHTML=sorted.map((t,i)=>{
+      const rank=t.disqualified?'DQ':i+1;
+      let rankClass='';
+      if(rank===1) rankClass='rank-1';
+      if(rank===2) rankClass='rank-2';
+      if(rank===3) rankClass='rank-3';
+      return `
+        <div class="lb-row ${rankClass} ${t.disqualified?'dq':''}">
+          <div class="lb-rank ${rankClass}">${rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank}</div>
+          <div class="lb-team">
+            <div class="lb-team-name">${escHtml(t.teamName)} ${t.ultimateDebugger?'👑':''}</div>
+            <div class="lb-players">${(t.players||[]).join(' & ')}</div>
+          </div>
+          <div>
+            <div class="lb-score">${t.score||0}</div>
+            ${t.disqualified?'<div style="color:var(--red);font-size:0.7rem;font-family:\'Orbitron\',monospace;">DISQUALIFIED</div>':''}
+          </div>
+          <div class="lb-level">Level ${t.level||1}<br><span style="font-size:0.7rem;">${t.status||''}</span></div>
+        </div>
+      `;
+    }).join('');
+    document.getElementById('lb-last-update').textContent='Updated '+new Date().toLocaleTimeString();
+  };
+  if(demoMode){render(Object.values(demoTeams));return;}
+  db.ref('teams').on('value',snap=>render(Object.values(snap.val()||{})));
+}
+
+// =====================================================================
+//  SPECTATOR MODE
+// =====================================================================
+function initSpectator(){
+  specView='lb';
+  renderSpec();
+  if(!demoMode&&db){
+    db.ref('teams').on('value',snap=>{
+      spectatorTeams=snap.val()||{};
+      renderSpec();
+      updateTicker();
+    });
+    db.ref('eventState').on('value',snap=>{if(snap.val())eventState=snap.val();});
+    db.ref('winner').on('value',snap=>{
+      if(snap.val()){
+        document.getElementById('winner-name').textContent=snap.val().teamName;
+        document.getElementById('winner-players').textContent=(snap.val().players||[]).join(' & ');
+        document.getElementById('winner-score').textContent=(snap.val().score||0)+' POINTS';
+        document.getElementById('winner-screen').classList.add('show');
+        spawnConfetti();
+      }
+    });
+  }else{
+    spectatorTeams=demoTeams;
+    updateTicker();
+  }
+  if(specTimerInterval) clearInterval(specTimerInterval);
+  specTimerInterval=setInterval(tickSpecTimer,1000);
+}
+
+function tickSpecTimer(){
+  if(!eventState.startTime) return;
+  const lvlDuration=60*1000;
+  const elapsed=(Date.now()-eventState.startTime)-(eventState.pauseOffset||0);
+  const remaining=Math.max(0,lvlDuration-elapsed);
+  const mins=Math.floor(remaining/60000);
+  const secs=Math.floor((remaining%60000)/1000);
+  const el=document.getElementById('spec-timer');
+  if(el) el.textContent=`${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+}
+
+function renderSpec(){
+  const el=document.getElementById('spec-content');
+  if(!el) return;
+  const teams=Object.values(spectatorTeams);
+  if(specView==='lb'){
+    const sorted=teams.sort((a,b)=>(b.score||0)-(a.score||0));
+    el.innerHTML=`
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+        ${sorted.map((t,i)=>`
+          <div style="background:rgba(0,20,0,0.8);border:1px solid ${i===0?'var(--gold)':i===1?'silver':i===2?'#cd7f32':'var(--border)'};border-radius:10px;padding:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span style="font-family:'Orbitron',monospace;font-size:1rem;color:${i===0?'var(--gold)':i===1?'silver':i===2?'#cd7f32':'var(--green)'};">#${i+1}</span>
+              <span class="status-badge ${getStatusClass(t.status)}" style="font-size:0.65rem;">${t.status||''}</span>
+            </div>
+            <div style="font-family:'Orbitron',monospace;font-size:0.9rem;margin-bottom:4px;">${escHtml(t.teamName)}</div>
+            <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:8px;">${(t.players||[]).join(' & ')}</div>
+            <div style="font-family:'Orbitron',monospace;font-size:1.4rem;color:var(--green);text-shadow:0 0 10px var(--green);">${t.score||0} pts</div>
+            <div class="progress-bar mt-10"><div class="progress-fill" style="width:${Math.min(100,((t.score||0)/700)*100)}%"></div></div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }else if(specView==='progress'){
+    el.innerHTML=`
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+          <thead>
+            <tr>
+              <th style="background:rgba(0,255,65,0.1);color:var(--green);font-family:'Orbitron',monospace;font-size:0.7rem;padding:10px;text-align:left;border-bottom:1px solid var(--border);">Team</th>
+              <th style="background:rgba(0,255,65,0.1);color:var(--green);font-family:'Orbitron',monospace;font-size:0.7rem;padding:10px;text-align:center;border-bottom:1px solid var(--border);">LVL 1</th>
+              <th style="background:rgba(0,255,65,0.1);color:var(--green);font-family:'Orbitron',monospace;font-size:0.7rem;padding:10px;text-align:center;border-bottom:1px solid var(--border);">LVL 2</th>
+              <th style="background:rgba(0,255,65,0.1);color:var(--green);font-family:'Orbitron',monospace;font-size:0.7rem;padding:10px;text-align:center;border-bottom:1px solid var(--border);">LVL 3</th>
+              <th style="background:rgba(0,255,65,0.1);color:var(--green);font-family:'Orbitron',monospace;font-size:0.7rem;padding:10px;text-align:center;border-bottom:1px solid var(--border);">SECRET</th>
+              <th style="background:rgba(0,255,65,0.1);color:var(--green);font-family:'Orbitron',monospace;font-size:0.7rem;padding:10px;text-align:right;border-bottom:1px solid var(--border);">SCORE</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${teams.map(t=>`
+              <tr>
+                <td style="padding:8px;border-bottom:1px solid rgba(0,255,65,0.08);">
+                  <div style="font-weight:700;">${escHtml(t.teamName)}</div>
+                  <div style="font-size:0.72rem;color:var(--text-dim);">${(t.players||[]).join(' & ')}</div>
+                </td>
+                ${[1,2,3,'s'].map(l=>`<td style="text-align:center;padding:8px;border-bottom:1px solid rgba(0,255,65,0.08);">${(t.completedLevels||[]).includes(l)?'✅':t.level===l?'🔄':'⬜'}</td>`).join('')}
+                <td style="text-align:right;padding:8px;border-bottom:1px solid rgba(0,255,65,0.08);font-family:'Orbitron',monospace;color:var(--green);">${t.score||0}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }else if(specView==='spotlight'){
+    if(!teams.length){el.innerHTML='<div style="text-align:center;color:var(--text-dim);padding:60px;">No teams to spotlight</div>';return;}
+    const top=teams.sort((a,b)=>(b.score||0)-(a.score||0))[0];
+    el.innerHTML=`
+      <div style="max-width:600px;margin:0 auto;text-align:center;">
+        <div style="font-size:0.8rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:3px;margin-bottom:12px;">CURRENT LEADER</div>
+        <div style="font-family:'Orbitron',monospace;font-size:clamp(1.5rem,5vw,2.5rem);color:var(--gold);text-shadow:0 0 30px var(--gold);margin-bottom:8px;">${escHtml(top.teamName)}</div>
+        <div style="color:var(--text-dim);margin-bottom:20px;">${(top.players||[]).join(' & ')}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;">
+          <div style="background:rgba(0,20,0,0.8);border:1px solid var(--border);border-radius:8px;padding:16px;">
+            <div style="font-size:0.7rem;color:var(--text-dim);">SCORE</div>
+            <div style="font-family:'Orbitron',monospace;font-size:1.5rem;color:var(--green);text-shadow:0 0 10px var(--green);">${top.score||0}</div>
+          </div>
+          <div style="background:rgba(0,20,0,0.8);border:1px solid var(--border);border-radius:8px;padding:16px;">
+            <div style="font-size:0.7rem;color:var(--text-dim);">LEVEL</div>
+            <div style="font-family:'Orbitron',monospace;font-size:1.5rem;color:var(--cyan);">${top.level||1}</div>
+          </div>
+          <div style="background:rgba(0,20,0,0.8);border:1px solid var(--border);border-radius:8px;padding:16px;">
+            <div style="font-size:0.7rem;color:var(--text-dim);">LIVES</div>
+            <div style="font-family:'Orbitron',monospace;font-size:1.5rem;color:var(--red);">${top.lives||0}❤️</div>
+          </div>
+        </div>
+        <div style="font-size:0.8rem;color:var(--text-dim);">Levels Completed: ${(top.completedLevels||[]).length}/3</div>
+        <div class="progress-bar mt-10"><div class="progress-fill" style="width:${Math.min(100,((top.score||0)/700)*100)}%;height:12px;"></div></div>
+      </div>
+    `;
+  }
+}
+
+function updateTicker(){
+  const teams=Object.values(spectatorTeams).sort((a,b)=>(b.score||0)-(a.score||0));
+  const text=teams.map((t,i)=>`#${i+1} ${t.teamName}: ${t.score||0}pts`).join('   |   ');
+  const el=document.getElementById('score-ticker');
+  if(el) el.textContent=text||'Waiting for teams...';
+}
+
+// =====================================================================
+//  HELP REQUEST
+// =====================================================================
+function requestHelp(){
+  if(!currentTeamId||!currentTeam){showToast('Register first!','error');return;}
+  const req={
+    id:'help_'+Date.now(),
+    teamId:currentTeamId,
+    teamName:currentTeam.teamName,
+    playerName:currentTeam.players?currentTeam.players[0]:'',
+    timestamp:Date.now(),
+    resolved:false
+  };
+  if(!demoMode&&db) db.ref('helpRequests/'+req.id).set(req);
+  else helpRequests.push(req);
+  showToast('Help request sent! Admin notified.','success');
+  logActivity(currentTeamId,'help_request','Help requested');
+}
+
+// =====================================================================
+//  UTILITY FUNCTIONS
+// =====================================================================
+function updateTeam(updates){
+  if(!currentTeamId) return;
+  Object.assign(currentTeam,updates);
+  localStorage.setItem('jarfix_team',JSON.stringify(currentTeam));
+  if(demoMode&&demoTeams[currentTeamId]) Object.assign(demoTeams[currentTeamId],updates);
+  else if(db) db.ref('teams/'+currentTeamId).update(updates);
+}
+
+function logActivity(teamId,action,details){
+  const entry={timestamp:Date.now(),teamId,action,details};
+  if(!demoMode&&db) db.ref('activityLogs').push(entry);
+}
+
+function showToast(msg,type='info'){
+  const container=document.getElementById('toast-container');
+  const toast=document.createElement('div');
+  toast.className=`toast ${type}`;
+  toast.textContent=msg;
+  container.appendChild(toast);
+  setTimeout(()=>toast.remove(),7000);
+}
+
+function showModal(icon,title,msg,buttons=[],style=''){
+  document.getElementById('modal-icon').textContent=icon;
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-msg').textContent=msg;
+  const btnsEl=document.getElementById('modal-btns');
+  const box=document.getElementById('modal-box');
+  box.className='modal';
+  if(style==='danger') box.classList.add('danger-modal');
+  if(style==='gold') box.classList.add('gold-modal');
+  if(!buttons.length){
+    btnsEl.innerHTML='<button class="btn btn-green" onclick="closeModal()">OK</button>';
+  }else{
+    btnsEl.innerHTML=buttons.map(b=>`<button class="btn ${b.cls||'btn-green'}" onclick="(${b.action.toString()})()">${b.label}</button>`).join('');
+  }
+  document.getElementById('modal-overlay').classList.add('show');
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('show');}
+
+function showAnnouncementBanner(text){
+  const banner=document.getElementById('announcement-banner');
+  banner.textContent='📢 '+text;
+  banner.classList.add('show');
+  setTimeout(()=>banner.classList.remove('show'),8000);
+}
+
+function switchTab(btn,tabId){
+  btn.closest('.tabs').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const parent=btn.closest('.lobby-container')||document.body;
+  parent.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+}
+
+function escHtml(s){
+  if(!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function syntaxHighlight(code){
+  if(!code.trim()) return '';
+  let s=escHtml(code);
+  // Comments
+  s=s.replace(/(#.*)$/,'<span class="syn-cmt">$1</span>');
+  // Strings
+  s=s.replace(/(&quot;.*?&quot;|&#x27;.*?&#x27;|&#39;.*?&#39;|'[^']*'|"[^"]*")/g,'<span class="syn-str">$1</span>');
+  // Keywords
+  const kws=['def','return','for','in','if','else','elif','while','and','or','not','True','False','None','import','from','class','pass','break','continue','lambda','try','except','finally','with','as','yield','raise','del','global','nonlocal','assert'];
+  kws.forEach(k=>{
+    s=s.replace(new RegExp('(?<![\\w])('+k+')(?![\\w])','g'),'<span class="syn-kw">$1</span>');
+  });
+  // Builtins
+  const builtins=['print','len','range','int','str','float','list','dict','set','tuple','type','input','sum','min','max','sorted','append','map','filter','zip','enumerate'];
+  builtins.forEach(b=>{
+    s=s.replace(new RegExp('(?<![\\w])('+b+')(?=\\()','g'),'<span class="syn-builtin">$1</span>');
+  });
+  // Numbers
+  s=s.replace(/(?<![&\w])(\d+\.?\d*)(?![\w;])/g,'<span class="syn-num">$1</span>');
+  return s;
+}
+
+function spawnConfetti(){
+  const colors=['#00ff41','#ffd700','#ff6600','#00ffff','#ff0040','#ffffff'];
+  for(let i=0;i<80;i++){
+    const piece=document.createElement('div');
+    piece.className='confetti-piece';
+    piece.style.left=Math.random()*100+'vw';
+    piece.style.top='-20px';
+    piece.style.background=colors[Math.floor(Math.random()*colors.length)];
+    piece.style.width=(Math.random()*10+5)+'px';
+    piece.style.height=(Math.random()*10+5)+'px';
+    piece.style.borderRadius=Math.random()>0.5?'50%':'0';
+    piece.style.animationDuration=(Math.random()*3+2)+'s';
+    piece.style.animationDelay=Math.random()*2+'s';
+    document.body.appendChild(piece);
+    setTimeout(()=>piece.remove(),(Math.random()*3+2)*1000+Math.random()*2000+1000);
+  }
+}
+
+function closeWinnerScreen(){
+  document.getElementById('winner-screen').classList.remove('show');
+}
+
+// =====================================================================
+//  BROWSER PERSISTENCE
+// =====================================================================
+function restoreSession(){
+  // Session restore disabled — always start fresh from landing
+  return false;
+}
+
+// Clear any saved session on every fresh page load
+(function clearSessionOnLoad(){
+  localStorage.removeItem('jarfix_teamId');
+  localStorage.removeItem('jarfix_team');
+  localStorage.removeItem('jarfix_demo');
+  // Clear any refresh count keys
+  Object.keys(localStorage).forEach(k=>{ if(k.startsWith('jarfix_refresh_')) localStorage.removeItem(k); });
+})();
+
+// =====================================================================
+//  HARDCODED FIREBASE CONFIG — NEXUS TECH 2K26
+// =====================================================================
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBOfKPgpVGr2JEPJEuKNTgjpOfDPiXsopQ",
+  authDomain: "nexus-jarfix.firebaseapp.com",
+  databaseURL: "https://nexus-jarfix-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "nexus-jarfix",
+  storageBucket: "nexus-jarfix.firebasestorage.app",
+  messagingSenderId: "719689191362",
+  appId: "1:719689191362:web:9249e74fd8f2cbc2bd105b",
+  measurementId: "G-N6W2K6686H"
+};
+
+// =====================================================================
+//  INIT
+// =====================================================================
+window.addEventListener('load',()=>{
+  // Auto-connect with hardcoded Firebase config — session restore handled inside initFirebase
+  initFirebase(FIREBASE_CONFIG);
+});
+</script>
+</body>
+</html>
