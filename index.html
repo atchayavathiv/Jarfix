@@ -39,15 +39,18 @@ html,body{width:100%;min-height:100%;background:var(--bg);color:var(--text);font
 /* ===== LANDING PAGE ===== */
 #landing{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
 /* 3D TILT CARD */
-.card-3d-scene{perspective:1500px;position:relative;width:380px;max-width:95vw;}
+.card-3d-scene{perspective:1500px;position:relative;width:380px;max-width:95vw;height:auto;min-height:540px;}
 .card-3d-grid{
   position:absolute;inset:0;z-index:50;
   display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);
   pointer-events:none;
+  min-height:560px;
 }
 .card-3d-grid div{cursor:pointer;pointer-events:none;}
 .card-3d-inner{
-  position:absolute;inset:0;
+  position:relative;
+  width:100%;
+  min-height:560px;
   transition:transform 0.3s ease-out;
   transform-style:preserve-3d;
 }
@@ -62,7 +65,7 @@ html,body{width:100%;min-height:100%;background:var(--bg);color:var(--text);font
 .card-3d-grid div:nth-child(9):hover ~ .card-3d-inner{transform:rotateX(-8deg) rotateY(8deg) scale(1.03);}
 
 .card-3d-body{
-  position:relative;width:100%;height:100%;border-radius:20px;overflow:hidden;
+  position:relative;width:100%;height:100%;min-height:560px;border-radius:20px;overflow:hidden;
   box-shadow:0 0 80px rgba(0,255,65,0.35),0 25px 60px rgba(0,0,0,0.8);
 }
 .card-3d-border-spin{
@@ -76,6 +79,8 @@ html,body{width:100%;min-height:100%;background:var(--bg);color:var(--text);font
   position:absolute;inset:2px;border-radius:18px;
   background:linear-gradient(160deg,#000e00 0%,#001a05 40%,#000500 100%);
   overflow:hidden;
+  display:flex;
+  flex-direction:column;
 }
 .card-3d-shimmer{
   position:absolute;inset:0;
@@ -206,6 +211,11 @@ input::placeholder{color:var(--text-dim);}
   grid-template-columns:repeat(4,1fr);
   gap:12px;
   margin-bottom:20px;
+}
+@media(max-width:540px){
+  .hud-bar{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .timer-display{font-size:1.4rem;}
+  .hud-value{font-size:1.1rem;}
 }
 .hud-item{
   background:rgba(0,20,0,0.9);
@@ -386,42 +396,82 @@ input::placeholder{color:var(--text-dim);}
   animation:confettiFall linear forwards;
   z-index:1000;
 }
+@keyframes memeShake{0%,100%{transform:translateX(0) scale(1);}15%{transform:translateX(-10px) rotate(-2deg) scale(1.02);}30%{transform:translateX(10px) rotate(2deg) scale(1.02);}50%{transform:translateX(-6px);}70%{transform:translateX(6px);}}
+.meme-shake{animation:memeShake 0.45s ease!important;}
+
 @keyframes confettiFall{
   0%{transform:translateY(-20px) rotate(0deg);opacity:1;}
   100%{transform:translateY(110vh) rotate(720deg);opacity:0;}
 }
 
-/* ===== POPUP/MODAL ===== */
+
+/* ===== POPUP/MODAL — CYBERPUNK THEME ===== */
 .overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.85);
-  z-index:500;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.92);
+  z-index:9000;display:none;
+  align-items:center;justify-content:center;
+  padding:20px;backdrop-filter:blur(10px);
 }
 .overlay.show{display:flex;}
 .modal{
-  background:rgba(0,20,0,0.98);
-  border:2px solid var(--green);
-  border-radius:16px;
-  padding:44px 40px;
-  max-width:640px;
-  width:100%;
-  box-shadow:0 0 80px var(--green-glow);
+  background:linear-gradient(160deg,#020d02 0%,#000800 60%,#020502 100%);
+  border:1px solid rgba(0,255,65,0.5);
+  border-radius:4px;
+  padding:0;
+  max-width:480px;width:100%;
+  max-height:90vh;overflow-y:auto;
+  box-shadow:0 0 0 1px rgba(0,255,65,0.15),0 0 40px rgba(0,255,65,0.2),0 0 80px rgba(0,0,0,0.8),inset 0 0 60px rgba(0,20,0,0.5);
   text-align:center;
-  animation:modalIn 0.3s ease;
+  animation:modalIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  position:relative;z-index:9001;
+  clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px));
 }
-@keyframes modalIn{from{transform:scale(0.8);opacity:0;}to{transform:scale(1);opacity:1;}}
-.modal.danger-modal{border-color:var(--red);box-shadow:0 0 80px rgba(255,0,64,0.4);}
-.modal.gold-modal{border-color:var(--gold);box-shadow:0 0 80px rgba(255,215,0,0.4);}
-.modal-icon{font-size:4rem;margin-bottom:16px;}
-.modal-title{font-family:'Orbitron',monospace;font-size:1.4rem;color:var(--green);margin-bottom:14px;}
-.modal-danger .modal-title{color:var(--red);}
-.modal-msg{font-size:1rem;color:var(--text);margin-bottom:28px;line-height:1.7;}
-.modal-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+@keyframes modalIn{from{transform:scale(0.85) translateY(20px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+.modal::before{
+  content:'';display:block;width:100%;height:3px;
+  background:linear-gradient(90deg,transparent,var(--green),var(--cyan),var(--green),transparent);
+}
+.modal-inner{padding:28px 26px 24px;}
+.modal-icon{font-size:3.2rem;margin-bottom:10px;display:block;filter:drop-shadow(0 0 12px var(--green));}
+.modal-title{
+  font-family:'Orbitron',monospace;font-size:1.1rem;color:var(--green);
+  margin-bottom:10px;letter-spacing:3px;text-transform:uppercase;
+  text-shadow:0 0 15px var(--green),0 0 30px rgba(0,255,65,0.4);
+}
+.modal-msg{
+  font-size:0.88rem;color:rgba(200,255,200,0.85);
+  margin-bottom:22px;line-height:1.8;
+  font-family:'Share Tech Mono',monospace;white-space:pre-line;
+}
+.modal-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+/* Danger */
+.modal.danger-modal{
+  border-color:rgba(255,0,64,0.6);
+  box-shadow:0 0 0 1px rgba(255,0,64,0.15),0 0 40px rgba(255,0,64,0.25),0 0 80px rgba(0,0,0,0.8),inset 0 0 60px rgba(20,0,0,0.5);
+  background:linear-gradient(160deg,#0d0202 0%,#080000 60%,#050202 100%);
+}
+.modal.danger-modal::before{background:linear-gradient(90deg,transparent,var(--red),#ff4400,var(--red),transparent);}
+.modal.danger-modal .modal-title{color:var(--red);text-shadow:0 0 15px var(--red),0 0 30px rgba(255,0,64,0.4);}
+.modal.danger-modal .modal-icon{filter:drop-shadow(0 0 12px var(--red));}
+/* Gold */
+.modal.gold-modal{
+  border-color:rgba(255,215,0,0.6);
+  box-shadow:0 0 0 1px rgba(255,215,0,0.15),0 0 40px rgba(255,215,0,0.25),0 0 80px rgba(0,0,0,0.8),inset 0 0 60px rgba(20,15,0,0.5);
+  background:linear-gradient(160deg,#0d0c02 0%,#080700 60%,#050400 100%);
+}
+.modal.gold-modal::before{background:linear-gradient(90deg,transparent,var(--gold),var(--orange),var(--gold),transparent);}
+.modal.gold-modal .modal-title{color:var(--gold);text-shadow:0 0 15px var(--gold),0 0 30px rgba(255,215,0,0.4);}
+.modal.gold-modal .modal-icon{filter:drop-shadow(0 0 12px var(--gold));}
+/* Warn */
+.modal.warn-modal{
+  border-color:rgba(255,102,0,0.6);
+  box-shadow:0 0 40px rgba(255,102,0,0.25),inset 0 0 60px rgba(20,8,0,0.5);
+  background:linear-gradient(160deg,#0d0600 0%,#080400 60%,#050200 100%);
+}
+.modal.warn-modal::before{background:linear-gradient(90deg,transparent,var(--orange),#ffcc00,var(--orange),transparent);}
+.modal.warn-modal .modal-title{color:var(--orange);text-shadow:0 0 15px var(--orange);}
+.modal.warn-modal .modal-icon{filter:drop-shadow(0 0 12px var(--orange));}
 
 /* ===== ACTIVITY LOGS ===== */
 .log-list{max-height:300px;overflow-y:auto;font-family:'Share Tech Mono',monospace;font-size:0.75rem;}
@@ -796,7 +846,7 @@ body.nav-visible .section.active{padding-top:56px;}
 .help-req-team{color:var(--orange);font-weight:700;}
 
 /* Admin login overlay */
-#admin-login-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:600;display:none;align-items:center;justify-content:center;}
+#admin-login-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9100;display:none;align-items:center;justify-content:center;}
 #admin-login-overlay.show{display:flex;}
 .admin-login-card{background:rgba(0,20,0,0.98);border:2px solid var(--red);border-radius:12px;padding:30px;max-width:380px;width:100%;box-shadow:0 0 40px rgba(255,0,64,0.3);}
 
@@ -862,11 +912,13 @@ body.nav-visible .section.active{padding-top:56px;}
 <!-- POPUP MODAL -->
 <div class="overlay" id="modal-overlay">
   <div class="modal" id="modal-box">
-    <div class="modal-icon" id="modal-icon">⚠️</div>
-    <div class="modal-title" id="modal-title">Alert</div>
-    <div class="modal-msg" id="modal-msg"></div>
-    <div class="modal-btns" id="modal-btns">
-      <button class="btn btn-green" onclick="closeModal()">OK</button>
+    <div class="modal-inner">
+      <div class="modal-icon" id="modal-icon">⚠️</div>
+      <div class="modal-title" id="modal-title">Alert</div>
+      <div class="modal-msg" id="modal-msg"></div>
+      <div class="modal-btns" id="modal-btns">
+        <button class="btn btn-green" onclick="closeModal()">OK</button>
+      </div>
     </div>
   </div>
 </div>
@@ -887,12 +939,14 @@ body.nav-visible .section.active{padding-top:56px;}
     </div>
   </div>
 </div>
-  <div class="winner-trophy">🏆</div>
-  <div class="winner-title" style="font-family:'Orbitron',monospace;color:var(--gold)">ULTIMATE DEBUGGER</div>
-  <div class="winner-name" id="winner-name"></div>
-  <div style="color:var(--text-dim);margin:10px 0;font-size:0.9rem" id="winner-players"></div>
-  <div style="font-family:'Orbitron',monospace;font-size:1.5rem;color:var(--green);margin:10px 0" id="winner-score"></div>
-  <button class="btn btn-gold mt-20" onclick="closeWinnerScreen()">CLOSE</button>
+  <div style="font-size:4rem;animation:bounce 0.8s infinite;">🦾🏆👑</div>
+  <div class="winner-title" style="font-family:'Orbitron',monospace;color:var(--gold);font-size:clamp(1.2rem,4vw,2.2rem);letter-spacing:3px;">👑 ULTIMATE DEBUGGER 👑</div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:0.9rem;color:var(--cyan);margin:6px 0;">Avengers would recruit you da! 🦸⚡</div>
+  <div class="winner-name" id="winner-name" style="font-size:clamp(1.2rem,3vw,2rem);"></div>
+  <div style="color:var(--text-dim);margin:6px 0;font-size:0.9rem" id="winner-players"></div>
+  <div style="font-family:'Orbitron',monospace;font-size:1.6rem;color:var(--green);margin:8px 0;text-shadow:0 0 20px var(--green);" id="winner-score"></div>
+  <div style="font-size:0.82rem;color:var(--gold);margin:8px 0;padding:8px 20px;border:1px solid var(--gold);border-radius:20px;background:rgba(255,215,0,0.08);">Tony Stark irukiraan... neenga thaane debug king da! 🔥</div>
+  <button class="btn btn-gold mt-20" onclick="closeWinnerScreen()" style="padding:14px 32px;">🏆 CLOSE</button>
 </div>
 
 <!-- Config page removed — Firebase hardcoded -->
@@ -902,7 +956,7 @@ body.nav-visible .section.active{padding-top:56px;}
 <div class="section" id="landing">
   <div id="landing-wrapper">
     <!-- 3D TILT CARD -->
-    <div class="card-3d-scene" id="main-card" style="height:580px;">
+    <div class="card-3d-scene" id="main-card" style="height:auto;min-height:560px;">
 
       <!-- Hover zones 3x3 grid -->
       <div class="card-3d-grid">
@@ -1049,6 +1103,10 @@ body.nav-visible .section.active{padding-top:56px;}
     <div class="landing-panel panel-from-left" id="panel-register">
       <div class="panel-inner">
         <button class="panel-back-btn" onclick="closePanel('panel-register')">◀ BACK TO ARENA</button>
+        <div id="reg-closed-banner" style="display:none;background:rgba(255,102,0,0.10);border:2px solid var(--orange);border-radius:10px;padding:14px 16px;margin-bottom:16px;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--orange);margin-bottom:4px;">⏳ EVENT IN PROGRESS</div>
+          <div style="font-size:0.78rem;color:var(--text-dim);">You can still register — admin must approve before you enter the arena.</div>
+        </div>
         <div class="card">
           <div class="card-title">⚡ Register Your Team</div>
           <div class="form-group">
@@ -1146,6 +1204,10 @@ body.nav-visible .section.active{padding-top:56px;}
         </div>
         <div id="event-waiting-msg" style="text-align:center;padding:20px;color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.8rem;">
           ⏳ WAITING FOR ADMIN TO START THE EVENT...
+        </div>
+        <div id="event-approval-msg" style="display:none;text-align:center;padding:20px;">
+          <div style="color:var(--orange);font-family:'Orbitron',monospace;font-size:0.9rem;text-shadow:0 0 10px var(--orange);">⏳ AWAITING ADMIN APPROVAL</div>
+          <div style="font-size:0.8rem;color:var(--text-dim);margin-top:8px;">Event is running. Wait for admin to approve your team.</div>
         </div>
         <div id="event-started-msg" style="display:none;text-align:center;padding:20px;">
           <div style="color:var(--green);font-family:'Orbitron',monospace;font-size:1rem;text-shadow:0 0 10px var(--green);">🚀 EVENT STARTED!</div>
@@ -1260,7 +1322,22 @@ body.nav-visible .section.active{padding-top:56px;}
     <!-- SCORE display -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
       <div style="font-family:'Orbitron',monospace;">SCORE: <span id="game-score" style="color:var(--green);text-shadow:0 0 10px var(--green);">0</span></div>
-      <div id="lives-icons"></div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="lives-icons"></div>
+        <button onclick="toggleGameLeaderboard()" style="background:rgba(0,20,0,0.9);border:1px solid var(--cyan);color:var(--cyan);padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:1px;" title="Live Leaderboard">📊 LIVE LB</button>
+      </div>
+    </div>
+
+    <!-- Slide-in game leaderboard -->
+    <div id="game-lb-panel" style="display:none;background:rgba(0,10,0,0.97);border:1px solid var(--cyan);border-radius:10px;padding:14px;margin-bottom:16px;max-height:300px;overflow-y:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:var(--cyan);">📊 LIVE LEADERBOARD</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div id="game-lb-update" style="font-size:0.65rem;color:var(--text-dim);">Loading...</div>
+          <button onclick="toggleGameLeaderboard()" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:1rem;">✕</button>
+        </div>
+      </div>
+      <div id="game-lb-rows"></div>
     </div>
 
     <!-- Level sections -->
@@ -1268,8 +1345,8 @@ body.nav-visible .section.active{padding-top:56px;}
       <!-- Level 1 -->
       <div id="level-section-1" class="level-section">
         <div class="secret-badge" style="background:rgba(0,255,65,0.06);border-color:var(--green);margin-bottom:10px;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--green);">LEVEL 1 — INITIATION</div>
-          <div style="font-size:0.75rem;color:var(--text-dim);margin-top:3px;">100 Points + Finish Bonus</div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--green);">🟢 EASY — AVENGERS ROLL CALL</div>
+          <div style="font-size:0.75rem;color:var(--text-dim);margin-top:3px;">100 pts • 2 Bugs • Easy</div>
         </div>
         <div id="desc-1" style="font-size:0.85rem;line-height:1.6;color:var(--text);background:rgba(0,20,0,0.6);padding:10px 14px;border-radius:6px;border-left:3px solid var(--green);margin-bottom:12px;"></div>
         <div class="arena-split">
@@ -1297,8 +1374,8 @@ body.nav-visible .section.active{padding-top:56px;}
       <!-- Level 2 -->
       <div id="level-section-2" class="level-section" style="display:none;">
         <div class="secret-badge" style="background:rgba(0,255,255,0.05);border-color:var(--cyan);margin-bottom:10px;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--cyan);">LEVEL 2 — ESCALATION</div>
-          <div style="font-size:0.75rem;color:var(--text-dim);margin-top:3px;">200 Points + Finish Bonus</div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--cyan);">🟡 MEDIUM — INFINITY POWER</div>
+          <div style="font-size:0.75rem;color:var(--text-dim);margin-top:3px;">200 pts • 3 Bugs • Medium</div>
         </div>
         <div id="desc-2" style="font-size:0.85rem;line-height:1.6;color:var(--text);background:rgba(0,20,0,0.6);padding:10px 14px;border-radius:6px;border-left:3px solid var(--cyan);margin-bottom:12px;"></div>
         <div class="arena-split">
@@ -1326,8 +1403,8 @@ body.nav-visible .section.active{padding-top:56px;}
       <!-- Level 3 -->
       <div id="level-section-3" class="level-section" style="display:none;">
         <div class="secret-badge" style="background:rgba(255,215,0,0.05);border-color:var(--gold);margin-bottom:10px;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--gold);">LEVEL 3 — ANNIHILATION</div>
-          <div style="font-size:0.75rem;color:var(--text-dim);margin-top:3px;">300 Points + Finish Bonus</div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--gold);">🔴 HARD — STARK ANALYSIS</div>
+          <div style="font-size:0.75rem;color:var(--text-dim);margin-top:3px;">300 pts • 3 Bugs • Hard</div>
         </div>
         <div id="desc-3" style="font-size:0.85rem;line-height:1.6;color:var(--text);background:rgba(0,20,0,0.6);padding:10px 14px;border-radius:6px;border-left:3px solid var(--gold);margin-bottom:12px;"></div>
         <div class="arena-split">
@@ -1355,7 +1432,7 @@ body.nav-visible .section.active{padding-top:56px;}
       <!-- SECRET LEVEL -->
       <div id="level-section-s" class="level-section" style="display:none;">
         <div class="secret-badge" style="margin-bottom:10px;">
-          <div class="secret-title">🌟 SECRET LEVEL — ULTIMATE CHALLENGE</div>
+          <div class="secret-title">🌟 💎 SECRET — AVENGERS SCORE</div>
           <div style="font-size:0.75rem;color:var(--text-dim);margin-top:3px;">BONUS • 30s Timer • First to finish = ULTIMATE DEBUGGER</div>
         </div>
         <div id="desc-s" style="font-size:0.85rem;line-height:1.6;color:var(--text);background:rgba(0,20,0,0.6);padding:10px 14px;border-radius:6px;border-left:3px solid var(--gold);margin-bottom:12px;"></div>
@@ -1388,7 +1465,7 @@ body.nav-visible .section.active{padding-top:56px;}
           <div style="font-family:'Orbitron',monospace;font-size:2rem;color:var(--red);text-shadow:0 0 20px var(--red);margin-bottom:16px;" id="over-title">GAME OVER</div>
           <div style="color:var(--text-dim);margin-bottom:20px;" id="over-msg">Your debugging journey ends here.</div>
           <div style="font-family:'Orbitron',monospace;font-size:1.4rem;color:var(--green);">Final Score: <span id="over-score">0</span></div>
-          <button class="btn btn-cyan mt-20" onclick="openPanel('panel-leaderboard','right');loadLeaderboard()">VIEW LEADERBOARD</button>
+          <button class="btn btn-cyan mt-20" onclick="toggleGameLeaderboard()">VIEW LEADERBOARD</button>
         </div>
       </div>
     </div>
@@ -1447,11 +1524,13 @@ body.nav-visible .section.active{padding-top:56px;}
       <!-- Navigation -->
       <div style="padding:6px 16px 6px;font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;">SECTIONS</div>
       <button class="admin-nav-btn active" id="anav-teams" onclick="adminSwitchTab('teams')">👥 Teams <span id="badge-teams" style="display:none;background:var(--green);color:#000;border-radius:10px;padding:0 5px;font-size:0.6rem;float:right;"></span></button>
+      <button class="admin-nav-btn" id="anav-late" onclick="adminSwitchTab('late')">⏰ Late Register <span id="badge-late" style="display:none;background:var(--orange);color:#000;border-radius:10px;padding:0 5px;font-size:0.6rem;float:right;"></span></button>
       <button class="admin-nav-btn" id="anav-lb" onclick="adminSwitchTab('lb')">🏆 Leaderboard</button>
       <button class="admin-nav-btn" id="anav-overrides" onclick="adminSwitchTab('overrides')">⚖️ Overrides <span id="badge-overrides" style="display:none;background:var(--orange);color:#000;border-radius:10px;padding:0 5px;font-size:0.6rem;float:right;"></span></button>
       <button class="admin-nav-btn" id="anav-help" onclick="adminSwitchTab('help')">🆘 Help Requests <span id="badge-help" style="display:none;background:var(--red);color:#fff;border-radius:10px;padding:0 5px;font-size:0.6rem;float:right;"></span></button>
       <button class="admin-nav-btn" id="anav-logs" onclick="adminSwitchTab('logs')">📋 Activity Log <span id="badge-logs" style="display:none;background:var(--cyan);color:#000;border-radius:10px;padding:0 5px;font-size:0.6rem;float:right;"></span></button>
       <button class="admin-nav-btn" id="anav-codeedit" onclick="adminSwitchTab('codeedit')">✏️ Code Editor</button>
+      <button class="admin-nav-btn" id="anav-manual" onclick="adminSwitchTab('manual')">📖 Level Guide</button>
     </div>
 
     <!-- RIGHT CONTENT AREA -->
@@ -1490,13 +1569,35 @@ body.nav-visible .section.active{padding-top:56px;}
         </div>
       </div>
 
+      <!-- TAB: LATE REGISTER -->
+      <div id="atab-content-late" style="display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;">
+          <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--orange);">⏰ LATE REGISTRATIONS</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-sm" style="color:var(--green);border-color:var(--green);font-size:0.65rem;" onclick="adminApproveAllLate()">✅ APPROVE ALL</button>
+            <button class="btn btn-cyan btn-sm" onclick="loadLateRegistrations()">↻ REFRESH</button>
+          </div>
+        </div>
+        <div style="background:rgba(255,102,0,0.06);border:1px solid rgba(255,102,0,0.3);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:0.78rem;color:var(--text-dim);">
+          ⚠️ These teams registered <b style="color:var(--orange);">after the event started</b>. They are waiting in the lobby until you approve. Approving will auto-start them into the arena immediately.
+        </div>
+        <div id="late-reg-list">
+          <div style="color:var(--text-dim);text-align:center;padding:30px;font-size:0.8rem;">Loading...</div>
+        </div>
+      </div>
+
       <!-- TAB: LEADERBOARD -->
       <div id="atab-content-lb" style="display:none;">
         <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--green);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);">🏆 LIVE LEADERBOARD</div>
         <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
             <div style="font-size:0.7rem;color:var(--text-dim);" id="admin-lb-update">—</div>
-            <button class="btn btn-cyan btn-sm" onclick="loadAdminLeaderboard()">↻ REFRESH</button>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button class="btn btn-cyan btn-sm" onclick="loadAdminLeaderboard()">↻ REFRESH</button>
+              <button class="btn btn-sm" style="color:var(--green);border-color:var(--green);font-size:0.6rem;" onclick="downloadAllCSV()">⬇ ALL TEAMS CSV</button>
+              <button class="btn btn-sm" style="color:var(--gold);border-color:var(--gold);font-size:0.6rem;" onclick="downloadAllPDF()">⬇ ALL TEAMS PDF</button>
+              <button class="btn btn-sm" style="color:var(--cyan);border-color:var(--cyan);font-size:0.6rem;" onclick="downloadSeparateCSVs()">⬇ SEPARATE CSVs</button>
+            </div>
           </div>
           <div id="admin-lb-preview" style="max-height:600px;overflow-y:auto;"></div>
         </div>
@@ -1533,28 +1634,341 @@ body.nav-visible .section.active{padding-top:56px;}
       <div id="atab-content-codeedit" style="display:none;">
         <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--cyan);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);">✏️ BUGGY CODE EDITOR</div>
         <div class="card">
-          <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+
+          <!-- Level selector + actions -->
+          <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
             <label style="color:var(--text-dim);font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;margin:0;">Level:</label>
             <select id="codeedit-level" onchange="adminLoadCodeEditor()" style="font-size:0.78rem;padding:6px 10px;background:rgba(0,20,0,0.9);border:1px solid var(--border);color:var(--text);border-radius:4px;font-family:'Share Tech Mono',monospace;">
               <option value="1">Level 1 — Counter Chaos</option>
               <option value="2">Level 2 — String Surgery</option>
               <option value="3">Level 3 — List Logic</option>
-              <option value="s">Secret Level — Sort & Conquer</option>
+              <option value="s">Secret Level — Sort &amp; Conquer</option>
             </select>
             <button class="btn btn-cyan btn-sm" onclick="adminLoadCodeEditor()">↻ LOAD</button>
-            <button class="btn btn-green btn-sm" onclick="adminSaveCodeEditor()">💾 SAVE & APPLY</button>
+            <button class="btn btn-green btn-sm" onclick="adminSaveCodeEditor()">💾 SAVE &amp; APPLY</button>
+            <button class="btn btn-sm" style="color:var(--orange);border-color:var(--orange);font-size:0.6rem;" onclick="adminClearCodeEditor()">🗑 CLEAR</button>
           </div>
-          <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">Edit each line. Tick <span style="color:var(--red);font-weight:700;">BUG</span> to mark a line as buggy for your reference.</div>
-          <div id="codeedit-lines" style="display:flex;flex-direction:column;gap:3px;max-height:500px;overflow-y:auto;"></div>
-          <div style="margin-top:14px;">
-            <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:6px;">EXPECTED OUTPUT</div>
-            <textarea id="codeedit-expected" style="width:100%;background:rgba(0,20,0,0.8);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;min-height:70px;resize:vertical;" placeholder="Expected output..."></textarea>
+
+          <!-- Instructions -->
+          <div style="background:rgba(0,255,65,0.04);border:1px solid rgba(0,255,65,0.15);border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:0.78rem;line-height:1.7;color:var(--text-dim);">
+            📋 <b style="color:var(--green);">How to use:</b> Paste or type the full buggy Python code below. Then mark the bug line numbers in the <b style="color:var(--red);">Bug Lines</b> field (comma-separated). Set the correct answers per bug line. Click <b style="color:var(--green);">SAVE &amp; APPLY</b> to push to live game.
           </div>
-          <div style="margin-top:10px;">
-            <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:6px;">DESCRIPTION</div>
-            <input type="text" id="codeedit-desc" style="width:100%;background:rgba(0,20,0,0.8);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;" placeholder="Level description...">
+
+          <!-- Full code textarea -->
+          <div style="margin-bottom:14px;">
+            <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--red);margin-bottom:6px;">🐛 FULL BUGGY CODE <span style="color:var(--text-dim);font-size:0.6rem;">(paste entire code here)</span></div>
+            <textarea id="codeedit-fullcode"
+              style="width:100%;background:#000f00;border:2px solid rgba(255,0,64,0.3);border-radius:6px;padding:14px;color:#c8ffc8;font-family:'Share Tech Mono',monospace;font-size:0.85rem;min-height:260px;resize:vertical;line-height:1.7;tab-size:4;"
+              spellcheck="false"
+              placeholder="# Paste the full buggy Python code here...
+def count_and_sum():
+    total = 0
+    for i in range(1, 6):
+        print(i - 1)   # BUG LINE
+        total += i
+    print('Sum:', totl) # BUG LINE
+count_and_sum(10)       # BUG LINE"
+              oninput="adminUpdateLineNumbers()"></textarea>
+          </div>
+
+          <!-- Two column: bug lines + correct answers -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+            <div>
+              <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--red);margin-bottom:6px;">🔴 BUG LINE NUMBERS <span style="color:var(--text-dim);font-size:0.6rem;">(comma-separated)</span></div>
+              <input type="text" id="codeedit-buglines"
+                placeholder="e.g. 4, 6, 8"
+                style="width:100%;background:rgba(0,20,0,0.8);border:1px solid rgba(255,0,64,0.4);border-radius:6px;padding:10px;color:var(--red);font-family:'Share Tech Mono',monospace;font-size:0.88rem;">
+              <div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">Line numbers that have bugs (1-based)</div>
+            </div>
+            <div>
+              <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--green);margin-bottom:6px;">✅ CORRECT ANSWERS <span style="color:var(--text-dim);font-size:0.6rem;">(one per line: lineNum:correct code)</span></div>
+              <textarea id="codeedit-answers"
+                placeholder="4:        print(i)&#10;6:    print(&quot;Sum:&quot;, total)&#10;8:count_and_sum()"
+                style="width:100%;background:rgba(0,20,0,0.8);border:1px solid rgba(0,255,65,0.3);border-radius:6px;padding:10px;color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.82rem;min-height:90px;resize:vertical;"></textarea>
+              <div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">Format: <code style="color:var(--cyan);">lineNumber:exact correct code</code></div>
+            </div>
+          </div>
+
+          <!-- Expected output + description -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+            <div>
+              <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:6px;">📤 EXPECTED OUTPUT</div>
+              <textarea id="codeedit-expected"
+                style="width:100%;background:rgba(0,20,0,0.8);border:1px solid rgba(255,215,0,0.3);border-radius:6px;padding:10px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;min-height:90px;resize:vertical;"
+                placeholder="1&#10;2&#10;3&#10;4&#10;5&#10;Sum: 15"></textarea>
+            </div>
+            <div>
+              <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:6px;">📝 DESCRIPTION</div>
+              <textarea id="codeedit-desc"
+                style="width:100%;background:rgba(0,20,0,0.8);border:1px solid rgba(255,215,0,0.3);border-radius:6px;padding:10px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;min-height:90px;resize:vertical;"
+                placeholder="This function should print numbers 1 to 5, then show the total sum. Three bugs are hiding..."></textarea>
+            </div>
+          </div>
+
+          <!-- Live preview -->
+          <div style="margin-bottom:14px;">
+            <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--cyan);margin-bottom:6px;">👁 CODE PREVIEW <span style="color:var(--text-dim);font-size:0.6rem;">(bug lines highlighted in red)</span></div>
+            <div id="codeedit-preview" style="background:#000f00;border:1px solid var(--border);border-radius:6px;padding:14px;font-family:'Share Tech Mono',monospace;font-size:0.82rem;min-height:80px;line-height:1.7;overflow-x:auto;white-space:pre;color:#c8ffc8;">
+              <span style="color:var(--text-dim);">Load a level or paste code above to preview...</span>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-green" onclick="adminSaveCodeEditor()" style="font-size:0.75rem;padding:10px 24px;">💾 SAVE &amp; APPLY TO GAME</button>
+            <button class="btn btn-cyan btn-sm" onclick="adminPreviewCode()">👁 PREVIEW</button>
           </div>
           <div id="codeedit-status" style="margin-top:10px;font-size:0.8rem;color:var(--green);display:none;font-family:'Orbitron',monospace;"></div>
+        </div>
+      </div>
+
+      <!-- TAB: LEVEL GUIDE (Admin Manual) -->
+      <div id="atab-content-manual" style="display:none;">
+        <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--gold);margin-bottom:6px;padding-bottom:10px;border-bottom:1px solid var(--border);">📖 LEVEL GUIDE — ADMIN MANUAL</div>
+        <div style="font-size:0.78rem;color:var(--text-dim);margin-bottom:20px;">Reference sheet for all levels: buggy code, bugs to find, correct answers, and expected output.</div>
+
+        <!-- EASY — LEVEL 1 -->
+        <div style="background:rgba(0,255,65,0.04);border:1px solid rgba(0,255,65,0.25);border-radius:10px;padding:18px;margin-bottom:20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+            <span style="font-size:1.1rem;">🟢</span>
+            <span style="font-family:'Orbitron',monospace;font-size:0.9rem;color:var(--green);font-weight:900;">EASY — AVENGERS ROLL CALL</span>
+            <span style="background:rgba(0,255,65,0.15);border:1px solid var(--green);color:var(--green);font-size:0.65rem;font-family:'Orbitron',monospace;padding:2px 10px;border-radius:20px;">100 PTS</span>
+            <span style="background:rgba(255,0,64,0.15);border:1px solid var(--red);color:var(--red);font-size:0.65rem;font-family:'Orbitron',monospace;padding:2px 10px;border-radius:20px;">2 BUGS</span>
+          </div>
+          <div style="font-size:0.82rem;color:var(--text);background:rgba(0,0,0,0.4);padding:10px 14px;border-left:3px solid var(--green);border-radius:4px;margin-bottom:14px;">
+            <b style="color:var(--green);">Description:</b> Tony Stark wrote code to print each Avenger reporting for duty and show the team size. TWO bugs are hiding — find and fix them!
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+            <div>
+              <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--red);margin-bottom:6px;">🐛 BUGGY CODE</div>
+              <pre style="background:#000f00;border:1px solid rgba(255,0,64,0.3);border-radius:6px;padding:12px;font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:#c8ffc8;overflow-x:auto;line-height:1.7;margin:0;">def avengers_roll_call(heroes):
+    for hero in heroes:
+        print(hero + " reporting for duty!")
+<span style="background:rgba(255,0,64,0.25);color:#ff4444;">    print("Team size:", Len(heroes))  # BUG 1 — line 4</span>
+
+<span style="background:rgba(255,0,64,0.25);color:#ff4444;">avengers_roll_Call([...])             # BUG 2 — line 6</span></pre>
+            </div>
+            <div>
+              <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--green);margin-bottom:6px;">✅ CORRECT FIXES</div>
+              <div style="background:#000f00;border:1px solid rgba(0,255,65,0.3);border-radius:6px;padding:12px;font-family:'Share Tech Mono',monospace;font-size:0.78rem;line-height:2;">
+                <div><span style="color:var(--text-dim);">Line 4 →</span> <span style="color:var(--green);">print("Team size:", len(heroes))</span></div>
+                <div><span style="color:var(--text-dim);">Line 6 →</span> <span style="color:var(--green);">avengers_roll_call([...])</span></div>
+              </div>
+              <div style="margin-top:10px;">
+                <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--cyan);margin-bottom:6px;">📤 EXPECTED OUTPUT</div>
+                <pre style="background:rgba(0,255,255,0.05);border:1px solid rgba(0,255,255,0.2);border-radius:6px;padding:10px;font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:var(--text);margin:0;">Iron Man reporting for duty!
+Thor reporting for duty!
+Hulk reporting for duty!
+Black Widow reporting for duty!
+Team size: 4</pre>
+              </div>
+            </div>
+          </div>
+          <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:6px;padding:10px;font-size:0.78rem;">
+            <span style="color:var(--gold);font-family:'Orbitron',monospace;font-size:0.65rem;">🔍 BUG EXPLANATION  </span>
+            Bug 1: <code style="color:#ff8;">Len(heroes)</code> — capital L is not a built-in → fix to <code style="color:var(--green);">len(heroes)</code> &nbsp;|&nbsp;
+            Bug 2: <code style="color:#ff8;">avengers_roll_Call</code> — capital C causes NameError → fix to <code style="color:var(--green);">avengers_roll_call</code>
+          </div>
+        </div>
+
+        <!-- MEDIUM — LEVEL 2 -->
+        <div style="background:rgba(0,255,255,0.04);border:1px solid rgba(0,255,255,0.25);border-radius:10px;padding:18px;margin-bottom:20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+            <span style="font-size:1.1rem;">🟡</span>
+            <span style="font-family:'Orbitron',monospace;font-size:0.9rem;color:var(--cyan);font-weight:900;">MEDIUM — INFINITY STONE POWER</span>
+            <span style="background:rgba(0,255,255,0.15);border:1px solid var(--cyan);color:var(--cyan);font-size:0.65rem;font-family:'Orbitron',monospace;padding:2px 10px;border-radius:20px;">200 PTS</span>
+            <span style="background:rgba(255,0,64,0.15);border:1px solid var(--red);color:var(--red);font-size:0.65rem;font-family:'Orbitron',monospace;padding:2px 10px;border-radius:20px;">3 BUGS</span>
+          </div>
+          <div style="font-size:0.82rem;color:var(--text);background:rgba(0,0,0,0.4);padding:10px 14px;border-left:3px solid var(--cyan);border-radius:4px;margin-bottom:14px;">
+            <b style="color:var(--cyan);">Description:</b> Thanos is calculating total Infinity Stone power (name length × 10). THREE bugs are sabotaging the Gauntlet — fix them before he snaps!
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+            <div>
+              <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--red);margin-bottom:6px;">🐛 BUGGY CODE</div>
+              <pre style="background:#000f00;border:1px solid rgba(255,0,64,0.3);border-radius:6px;padding:12px;font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:#c8ffc8;overflow-x:auto;line-height:1.7;margin:0;">def infinity_power(stones):
+    total = 0
+    for stone in stones:
+        power = len(stone) * 10
+        total += power
+    print("Stones:", len(stones))
+<span style="background:rgba(255,0,64,0.25);color:#ff4444;">    print("Total Power:", totol)       # BUG 1 — line 7</span>
+    if total >= 100:
+        print("Thanos: UNSTOPPABLE!")
+    else:
+        print("Thanos: STOPPABLE!")
+
+infinity_power(["Mind","Soul","Space","Power","Time","Reality"])
+<span style="background:rgba(255,0,64,0.25);color:#ff4444;">Infinity_power(["Mind", "Soul"])       # BUG 2 — line 14</span>
+<span style="background:rgba(255,0,64,0.25);color:#ff4444;">infinity_power(["Mind", "Soul" "Space"])# BUG 3 — line 15</span></pre>
+            </div>
+            <div>
+              <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--green);margin-bottom:6px;">✅ CORRECT FIXES</div>
+              <div style="background:#000f00;border:1px solid rgba(0,255,65,0.3);border-radius:6px;padding:12px;font-family:'Share Tech Mono',monospace;font-size:0.78rem;line-height:2;">
+                <div><span style="color:var(--text-dim);">Line 7  →</span> <span style="color:var(--green);">print("Total Power:", total)</span></div>
+                <div><span style="color:var(--text-dim);">Line 14 →</span> <span style="color:var(--green);">infinity_power(["Mind", "Soul"])</span></div>
+                <div><span style="color:var(--text-dim);">Line 15 →</span> <span style="color:var(--green);">infinity_power(["Mind", "Soul", "Space"])</span></div>
+              </div>
+              <div style="margin-top:10px;">
+                <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--cyan);margin-bottom:6px;">📤 EXPECTED OUTPUT</div>
+                <pre style="background:rgba(0,255,255,0.05);border:1px solid rgba(0,255,255,0.2);border-radius:6px;padding:10px;font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:var(--text);margin:0;">Stones: 6
+Total Power: 290
+Thanos: UNSTOPPABLE!
+Stones: 2
+Total Power: 80
+Thanos: STOPPABLE!</pre>
+              </div>
+            </div>
+          </div>
+          <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:6px;padding:10px;font-size:0.78rem;">
+            <span style="color:var(--gold);font-family:'Orbitron',monospace;font-size:0.65rem;">🔍 BUG EXPLANATION  </span>
+            Bug 1: <code style="color:#ff8;">totol</code> is a typo (NameError) → fix to <code style="color:var(--green);">total</code> &nbsp;|&nbsp;
+            Bug 2: <code style="color:#ff8;">Infinity_power</code> capital I causes NameError → fix to <code style="color:var(--green);">infinity_power</code> &nbsp;|&nbsp;
+            Bug 3: <code style="color:#ff8;">"Soul" "Space"</code> missing comma causes implicit concat → add <code style="color:var(--green);">,</code> between them
+          </div>
+        </div>
+
+        <!-- HARD — LEVEL 3 -->
+        <div style="background:rgba(255,80,0,0.04);border:1px solid rgba(255,80,0,0.3);border-radius:10px;padding:18px;margin-bottom:20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+            <span style="font-size:1.1rem;">🔴</span>
+            <span style="font-family:'Orbitron',monospace;font-size:0.9rem;color:var(--orange);font-weight:900;">HARD — STARK SUIT ANALYSIS</span>
+            <span style="background:rgba(255,102,0,0.2);border:1px solid var(--orange);color:var(--orange);font-size:0.65rem;font-family:'Orbitron',monospace;padding:2px 10px;border-radius:20px;">300 PTS</span>
+            <span style="background:rgba(255,0,64,0.15);border:1px solid var(--red);color:var(--red);font-size:0.65rem;font-family:'Orbitron',monospace;padding:2px 10px;border-radius:20px;">3 BUGS</span>
+          </div>
+          <div style="font-size:0.82rem;color:var(--text);background:rgba(0,0,0,0.4);padding:10px 14px;border-left:3px solid var(--orange);border-radius:4px;margin-bottom:14px;">
+            <b style="color:var(--orange);">Description:</b> JARVIS must find the most powerful Iron Man suit (name length × 15) across all suits. THREE tricky bugs are corrupting the system — debug it!
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+            <div>
+              <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--red);margin-bottom:6px;">🐛 BUGGY CODE</div>
+              <pre style="background:#000f00;border:1px solid rgba(255,0,64,0.3);border-radius:6px;padding:12px;font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:#c8ffc8;overflow-x:auto;line-height:1.7;margin:0;">def stark_analysis(suits):
+    max_power = 0
+    best_suit = ""
+    for suit in suits:
+        power = len(suit) * 15
+        if power > max_power:
+            max_power = power
+<span style="background:rgba(255,0,64,0.25);color:#ff4444;">            best_suit = suits          # BUG 1 — line 8</span>
+    print("Best Suit:", best_suit)
+<span style="background:rgba(255,0,64,0.25);color:#ff4444;">    print("Max Power:", max_Power)    # BUG 2 — line 10</span>
+    print("Total Suits:", len(suits))
+
+stark_analysis(["Mark I","Mark III","Mark XLII","Iron Patriot","War Machine"])
+<span style="background:rgba(255,0,64,0.25);color:#ff4444;">stark_Analysis(["Mark I", "Mark II"]) # BUG 3 — line 14</span></pre>
+            </div>
+            <div>
+              <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--green);margin-bottom:6px;">✅ CORRECT FIXES</div>
+              <div style="background:#000f00;border:1px solid rgba(0,255,65,0.3);border-radius:6px;padding:12px;font-family:'Share Tech Mono',monospace;font-size:0.78rem;line-height:2;">
+                <div><span style="color:var(--text-dim);">Line 8  →</span> <span style="color:var(--green);">best_suit = suit</span> <span style="color:var(--text-dim);font-size:0.7rem;">(not suits)</span></div>
+                <div><span style="color:var(--text-dim);">Line 10 →</span> <span style="color:var(--green);">print("Max Power:", max_power)</span></div>
+                <div><span style="color:var(--text-dim);">Line 14 →</span> <span style="color:var(--green);">stark_analysis(["Mark I", "Mark II"])</span></div>
+              </div>
+              <div style="margin-top:10px;">
+                <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--cyan);margin-bottom:6px;">📤 EXPECTED OUTPUT</div>
+                <pre style="background:rgba(0,255,255,0.05);border:1px solid rgba(0,255,255,0.2);border-radius:6px;padding:10px;font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:var(--text);margin:0;">Best Suit: Iron Patriot
+Max Power: 180
+Total Suits: 5
+Best Suit: Mark II
+Max Power: 105
+Total Suits: 2</pre>
+              </div>
+            </div>
+          </div>
+          <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:6px;padding:10px;font-size:0.78rem;">
+            <span style="color:var(--gold);font-family:'Orbitron',monospace;font-size:0.65rem;">🔍 BUG EXPLANATION  </span>
+            Bug 1: <code style="color:#ff8;">best_suit = suits</code> assigns the whole list instead of current item → fix to <code style="color:var(--green);">suit</code> &nbsp;|&nbsp;
+            Bug 2: <code style="color:#ff8;">max_Power</code> capital P causes NameError → fix to <code style="color:var(--green);">max_power</code> &nbsp;|&nbsp;
+            Bug 3: <code style="color:#ff8;">stark_Analysis</code> capital A causes NameError → fix to <code style="color:var(--green);">stark_analysis</code>
+          </div>
+        </div>
+
+        <!-- SECRET LEVEL -->
+        <div style="background:rgba(255,215,0,0.04);border:2px solid rgba(255,215,0,0.4);border-radius:10px;padding:18px;margin-bottom:20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+            <span style="font-size:1.1rem;">💎</span>
+            <span style="font-family:'Orbitron',monospace;font-size:0.9rem;color:var(--gold);font-weight:900;">🔒 SECRET — AVENGERS SCORE BOARD</span>
+            <span style="background:rgba(255,215,0,0.2);border:1px solid var(--gold);color:var(--gold);font-size:0.65rem;font-family:'Orbitron',monospace;padding:2px 10px;border-radius:20px;">+500 PTS · ULTIMATE DEBUGGER</span>
+            <span style="background:rgba(255,0,64,0.15);border:1px solid var(--red);color:var(--red);font-size:0.65rem;font-family:'Orbitron',monospace;padding:2px 10px;border-radius:20px;">3 BUGS</span>
+          </div>
+          <div style="font-size:0.82rem;color:var(--text);background:rgba(0,0,0,0.4);padding:10px 14px;border-left:3px solid var(--gold);border-radius:4px;margin-bottom:14px;">
+            <b style="color:var(--gold);">Description:</b> Nick Fury's score calculator (name length × 7) finds the team MVP. THREE hidden bugs are crashing the SHIELD system! Unlocked after completing Level 3.
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+            <div>
+              <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--red);margin-bottom:6px;">🐛 BUGGY CODE</div>
+              <pre style="background:#000f00;border:1px solid rgba(255,0,64,0.3);border-radius:6px;padding:12px;font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:#c8ffc8;overflow-x:auto;line-height:1.7;margin:0;">def avengers_score(team):
+    scores = []
+    total = 0
+    for hero in team:
+        score = len(hero) * 7
+        scores.append(score)
+        total += score
+<span style="background:rgba(255,0,64,0.25);color:#ff4444;">    average = total // len(teams)     # BUG 1 — line 8</span>
+    print("Scores:", scores)
+    print("Total:", total)
+    print("Average:", average)
+    print("MVP:", team[scores.index(max(scores))])
+
+avengers_score(["Thor","Iron Man","Captain America","Black Widow","Hulk"])
+<span style="background:rgba(255,0,64,0.25);color:#ff4444;">Avengers_score(["Thor", "Hulk"])      # BUG 2 — line 15</span>
+<span style="background:rgba(255,0,64,0.25);color:#ff4444;">avengers_score()                      # BUG 3 — line 16</span></pre>
+            </div>
+            <div>
+              <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--green);margin-bottom:6px;">✅ CORRECT FIXES</div>
+              <div style="background:#000f00;border:1px solid rgba(0,255,65,0.3);border-radius:6px;padding:12px;font-family:'Share Tech Mono',monospace;font-size:0.78rem;line-height:2;">
+                <div><span style="color:var(--text-dim);">Line 8  →</span> <span style="color:var(--green);">average = total // len(team)</span></div>
+                <div><span style="color:var(--text-dim);">Line 15 →</span> <span style="color:var(--green);">avengers_score(["Thor", "Hulk"])</span></div>
+                <div><span style="color:var(--text-dim);">Line 16 →</span> <span style="color:var(--green);">avengers_score(["Thor", "Iron Man", ...])</span></div>
+              </div>
+              <div style="margin-top:10px;">
+                <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--cyan);margin-bottom:6px;">📤 EXPECTED OUTPUT</div>
+                <pre style="background:rgba(0,255,255,0.05);border:1px solid rgba(0,255,255,0.2);border-radius:6px;padding:10px;font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:var(--text);margin:0;">Scores: [28, 56, 105, 77, 28]
+Total: 294
+Average: 58
+MVP: Captain America</pre>
+              </div>
+            </div>
+          </div>
+          <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:6px;padding:10px;font-size:0.78rem;">
+            <span style="color:var(--gold);font-family:'Orbitron',monospace;font-size:0.65rem;">🔍 BUG EXPLANATION  </span>
+            Bug 1: <code style="color:#ff8;">len(teams)</code> typo (NameError) → fix to <code style="color:var(--green);">len(team)</code> &nbsp;|&nbsp;
+            Bug 2: <code style="color:#ff8;">Avengers_score</code> capital A causes NameError → fix to <code style="color:var(--green);">avengers_score</code> &nbsp;|&nbsp;
+            Bug 3: <code style="color:#ff8;">avengers_score()</code> missing argument (TypeError) → pass the hero list
+          </div>
+        </div>
+
+        <!-- SCORING SUMMARY -->
+        <div style="background:rgba(0,20,0,0.7);border:1px solid var(--border);border-radius:10px;padding:18px;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--gold);margin-bottom:14px;">📊 SCORING SUMMARY</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">
+            <div style="background:rgba(0,255,65,0.08);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;">
+              <div style="font-size:0.65rem;color:var(--text-dim);font-family:'Orbitron',monospace;margin-bottom:4px;">🟢 EASY</div>
+              <div style="font-family:'Orbitron',monospace;font-size:1.2rem;color:var(--green);">100 pts</div>
+              <div style="font-size:0.65rem;color:var(--text-dim);margin-top:4px;">2 bugs</div>
+            </div>
+            <div style="background:rgba(0,255,255,0.06);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;">
+              <div style="font-size:0.65rem;color:var(--text-dim);font-family:'Orbitron',monospace;margin-bottom:4px;">🟡 MEDIUM</div>
+              <div style="font-family:'Orbitron',monospace;font-size:1.2rem;color:var(--cyan);">200 pts</div>
+              <div style="font-size:0.65rem;color:var(--text-dim);margin-top:4px;">3 bugs</div>
+            </div>
+            <div style="background:rgba(255,102,0,0.06);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;">
+              <div style="font-size:0.65rem;color:var(--text-dim);font-family:'Orbitron',monospace;margin-bottom:4px;">🔴 HARD</div>
+              <div style="font-family:'Orbitron',monospace;font-size:1.2rem;color:var(--orange);">300 pts</div>
+              <div style="font-size:0.65rem;color:var(--text-dim);margin-top:4px;">3 bugs</div>
+            </div>
+            <div style="background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:8px;padding:12px;text-align:center;">
+              <div style="font-size:0.65rem;color:var(--text-dim);font-family:'Orbitron',monospace;margin-bottom:4px;">💎 SECRET</div>
+              <div style="font-family:'Orbitron',monospace;font-size:1.2rem;color:var(--gold);">+500 pts</div>
+              <div style="font-size:0.65rem;color:var(--text-dim);margin-top:4px;">3 bugs</div>
+            </div>
+            <div style="background:rgba(0,255,65,0.05);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;">
+              <div style="font-size:0.65rem;color:var(--text-dim);font-family:'Orbitron',monospace;margin-bottom:4px;">1ST FINISH BONUS</div>
+              <div style="font-family:'Orbitron',monospace;font-size:1.2rem;color:var(--green);">+50 pts</div>
+            </div>
+            <div style="background:rgba(0,255,65,0.05);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;">
+              <div style="font-size:0.65rem;color:var(--text-dim);font-family:'Orbitron',monospace;margin-bottom:4px;">2ND / 3RD BONUS</div>
+              <div style="font-family:'Orbitron',monospace;font-size:1.2rem;color:var(--green);">+25 / +10</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1626,144 +2040,145 @@ let helpRequests=[];
 // QUESTIONS — 3 bugs per level
 const QUESTIONS={
   1:{
-    title:'Level 1 — The Counter Chaos',
-    description:'This function should print numbers 1 to 5, then show the total sum. Three bugs are hiding — find and fix them all!',
+    title:'EASY — Avengers Roll Call',
+    description:'Tony Stark wrote code to print each Avenger reporting for duty and show the team size. TWO bugs are hiding — find and fix them!',
     code:[
-      {n:1, code:'def count_and_sum():'},
-      {n:2, code:'    total = 0'},
-      {n:3, code:'    for i in range(1, 6):'},
-      {n:4, code:'        print(i - 1)',bug:true},
-      {n:5, code:'        total += i'},
-      {n:6, code:'    print("Sum:", totl)',bug:true},
-      {n:7, code:''},
-      {n:8, code:'count_and_sum(10)',bug:true},
+      {n:1, code:'def avengers_roll_call(heroes):'},
+      {n:2, code:'    for hero in heroes:'},
+      {n:3, code:'        print(hero + " reporting for duty!")'},
+      {n:4, code:'    print("Team size:", Len(heroes))',bug:true},
+      {n:5, code:''},
+      {n:6, code:'avengers_roll_Call(["Iron Man", "Thor", "Hulk", "Black Widow"])',bug:true},
     ],
-    expectedOutput:'1\n2\n3\n4\n5\nSum: 15',
-    // bugs: line4 should be print(i), line6 totl->total, line8 no arg
-    bugLines:[4,6,8],
+    expectedOutput:'Iron Man reporting for duty!\nThor reporting for duty!\nHulk reporting for duty!\nBlack Widow reporting for duty!\nTeam size: 4',
+    bugLines:[4,6],
     answers:{
-      4:'        print(i)',
-      6:'    print("Sum:", total)',
-      8:'count_and_sum()'
+      4:'    print("Team size:", len(heroes))',
+      6:'avengers_roll_call(["Iron Man", "Thor", "Hulk", "Black Widow"])'
     },
     altAnswers:{
-      4:['        print(i)','    print(i)','print(i)'],
-      6:['    print("Sum:", total)','print("Sum:", total)'],
-      8:['count_and_sum()']
+      4:['    print("Team size:", len(heroes))','print("Team size:", len(heroes))'],
+      6:['avengers_roll_call(["Iron Man", "Thor", "Hulk", "Black Widow"])']
     }
   },
   2:{
-    title:'Level 2 — String Surgery',
-    description:'This function should reverse a string, count its vowels, and print both. Three bugs lurk inside!',
+    title:'MEDIUM — Infinity Stone Power',
+    description:'Thanos is calculating total Infinity Stone power (name length x 10). THREE bugs are sabotaging the Gauntlet — fix them before he snaps!',
     code:[
-      {n:1, code:'def analyse_string(s):'},
-      {n:2, code:'    reversed_s = s[::-1]'},
-      {n:3, code:'    vowels = "aeiou"'},
-      {n:4, code:'    count = 0'},
-      {n:5, code:'    for ch in s:'},
-      {n:6, code:'        if ch in vowels:'},
-      {n:7, code:'            count + 1',bug:true},
-      {n:8, code:'    print("Reversed:", reversed_s)'},
-      {n:9, code:'    print("Vowels:", count)'},
-      {n:10,code:''},
-      {n:11,code:'analyse_string("Hello World"',bug:true},
-      {n:12,code:'analyse_String("Python")',bug:true},
+      {n:1,  code:'def infinity_power(stones):'},
+      {n:2,  code:'    total = 0'},
+      {n:3,  code:'    for stone in stones:'},
+      {n:4,  code:'        power = len(stone) * 10'},
+      {n:5,  code:'        total += power'},
+      {n:6,  code:'    print("Stones:", len(stones))'},
+      {n:7,  code:'    print("Total Power:", totol)',bug:true},
+      {n:8,  code:'    if total >= 100:'},
+      {n:9,  code:'        print("Thanos: UNSTOPPABLE!")'},
+      {n:10, code:'    else:'},
+      {n:11, code:'        print("Thanos: STOPPABLE!")'},
+      {n:12, code:''},
+      {n:13, code:'infinity_power(["Mind", "Soul", "Space", "Power", "Time", "Reality"])'},
+      {n:14, code:'Infinity_power(["Mind", "Soul"])',bug:true},
+      {n:15, code:'infinity_power(["Mind", "Soul" "Space"])',bug:true},
     ],
-    expectedOutput:'Reversed: dlroW olleH\nVowels: 3\nReversed: nohtyP\nVowels: 1',
-    bugLines:[7,11,12],
+    expectedOutput:'Stones: 6\nTotal Power: 290\nThanos: UNSTOPPABLE!\nStones: 2\nTotal Power: 80\nThanos: STOPPABLE!',
+    bugLines:[7,14,15],
     answers:{
-      7:'            count += 1',
-      11:'analyse_string("Hello World")',
-      12:'analyse_string("Python")'
+      7:'    print("Total Power:", total)',
+      14:'infinity_power(["Mind", "Soul"])',
+      15:'infinity_power(["Mind", "Soul", "Space"])'
     },
     altAnswers:{
-      7:['            count += 1','count += 1'],
-      11:['analyse_string("Hello World")'],
-      12:['analyse_string("Python")']
+      7:['    print("Total Power:", total)','print("Total Power:", total)'],
+      14:['infinity_power(["Mind", "Soul"])'],
+      15:['infinity_power(["Mind", "Soul", "Space"])']
     }
   },
   3:{
-    title:'Level 3 — List Logic Failure',
-    description:'This function should find the largest number in a list and its index. Three bugs are sabotaging the result!',
+    title:'HARD — Stark Suit Analysis',
+    description:'JARVIS must find the most powerful Iron Man suit (name length x 15) and list all suits. THREE tricky bugs are corrupting the system — debug it!',
     code:[
-      {n:1, code:'def find_largest(nums):'},
-      {n:2, code:'    max_val = nums[0]'},
-      {n:3, code:'    max_idx = 0'},
-      {n:4, code:'    for i in range(len(nums)):'},
-      {n:5, code:'        if nums[i] > max_val:'},
-      {n:6, code:'            max_val = nums[1]',bug:true},
-      {n:7, code:'            max_idx = i'},
-      {n:8, code:'    print("Largest:", max_val)'},
-      {n:9, code:'    print("Index:", max_idx)'},
-      {n:10,code:''},
-      {n:11,code:'find_largest([3, 7, 1, 9, 4])'},
-      {n:12,code:'find_largest([10, 2, 8])',bug:true},
-      {n:13,code:'find_largest([])',bug:true},
+      {n:1,  code:'def stark_analysis(suits):'},
+      {n:2,  code:'    max_power = 0'},
+      {n:3,  code:'    best_suit = ""'},
+      {n:4,  code:'    for suit in suits:'},
+      {n:5,  code:'        power = len(suit) * 15'},
+      {n:6,  code:'        if power > max_power:'},
+      {n:7,  code:'            max_power = power'},
+      {n:8,  code:'            best_suit = suits',bug:true},
+      {n:9,  code:'    print("Best Suit:", best_suit)'},
+      {n:10, code:'    print("Max Power:", max_Power)',bug:true},
+      {n:11, code:'    print("Total Suits:", len(suits))'},
+      {n:12, code:''},
+      {n:13, code:'stark_analysis(["Mark I", "Mark III", "Mark XLII", "Iron Patriot", "War Machine"])'},
+      {n:14, code:'stark_Analysis(["Mark I", "Mark II"])',bug:true},
     ],
-    expectedOutput:'Largest: 9\nIndex: 3\nLargest: 10\nIndex: 0',
-    bugLines:[6,12,13],
+    expectedOutput:'Best Suit: Iron Patriot\nMax Power: 180\nTotal Suits: 5\nBest Suit: Mark II\nMax Power: 105\nTotal Suits: 2',
+    bugLines:[8,10,14],
     answers:{
-      6:'            max_val = nums[i]',
-      12:'find_largest([10, 2, 8])',
-      13:'find_largest([5, 3, 8])'
+      8:'            best_suit = suit',
+      10:'    print("Max Power:", max_power)',
+      14:'stark_analysis(["Mark I", "Mark II"])'
     },
     altAnswers:{
-      6:['            max_val = nums[i]','max_val = nums[i]'],
-      12:['find_largest([10, 2, 8])'],
-      13:['find_largest([5, 3, 8])','find_largest([1, 2, 3])']
+      8:['            best_suit = suit','best_suit = suit'],
+      10:['    print("Max Power:", max_power)','print("Max Power:", max_power)'],
+      14:['stark_analysis(["Mark I", "Mark II"])']
     }
   },
   s:{
-    title:'SECRET LEVEL — Sort & Conquer',
-    description:'Bubble sort should sort ascending AND print the sum. Three critical bugs broke it all!',
+    title:'SECRET — Avengers Score Board',
+    description:'Nick Fury built an Avengers score calculator (name length x 7) to find the MVP. THREE hidden bugs are crashing the SHIELD system — fix them all!',
     code:[
-      {n:1, code:'def bubble_sort(arr):'},
-      {n:2, code:'    n = len(arr)'},
-      {n:3, code:'    for i in range(n):'},
-      {n:4, code:'        for j in range(0, n-i-1):'},
-      {n:5, code:'            if arr[j] < arr[j+1]:',bug:true},
-      {n:6, code:'                arr[j], arr[j+1] = arr[j+1], arr[j]'},
-      {n:7, code:'    print("Sorted:", arr)'},
-      {n:8, code:'    print("Sum:", sum(arr))'},
-      {n:9, code:''},
-      {n:10,code:'bubble_sort([64, 34, 25, 12, 22])'},
-      {n:11,code:'bubble_sort([5, 3, 8, 1])',bug:true},
-      {n:12,code:'print("Done" + 1)',bug:true},
+      {n:1,  code:'def avengers_score(team):'},
+      {n:2,  code:'    scores = []'},
+      {n:3,  code:'    total = 0'},
+      {n:4,  code:'    for hero in team:'},
+      {n:5,  code:'        score = len(hero) * 7'},
+      {n:6,  code:'        scores.append(score)'},
+      {n:7,  code:'        total += score'},
+      {n:8,  code:'    average = total // len(teams)',bug:true},
+      {n:9,  code:'    print("Scores:", scores)'},
+      {n:10, code:'    print("Total:", total)'},
+      {n:11, code:'    print("Average:", average)'},
+      {n:12, code:'    print("MVP:", team[scores.index(max(scores))])'},
+      {n:13, code:''},
+      {n:14, code:'avengers_score(["Thor", "Iron Man", "Captain America", "Black Widow", "Hulk"])'},
+      {n:15, code:'Avengers_score(["Thor", "Hulk"])',bug:true},
+      {n:16, code:'avengers_score()',bug:true},
     ],
-    expectedOutput:'Sorted: [12, 22, 25, 34, 64]\nSum: 157\nSorted: [1, 3, 5, 8]\nSum: 17\nDone',
-    bugLines:[5,11,12],
+    expectedOutput:'Scores: [28, 56, 105, 77, 28]\nTotal: 294\nAverage: 58\nMVP: Captain America',
+    bugLines:[8,15,16],
     answers:{
-      5:'            if arr[j] > arr[j+1]:',
-      11:'bubble_sort([5, 3, 8, 1])',
-      12:'print("Done")'
+      8:'    average = total // len(team)',
+      15:'avengers_score(["Thor", "Hulk"])',
+      16:'avengers_score(["Thor", "Iron Man", "Captain America", "Black Widow", "Hulk"])'
     },
     altAnswers:{
-      5:['            if arr[j] > arr[j+1]:','if arr[j] > arr[j+1]:'],
-      11:['bubble_sort([5, 3, 8, 1])'],
-      12:['print("Done")']
+      8:['    average = total // len(team)','average = total // len(team)'],
+      15:['avengers_score(["Thor", "Hulk"])'],
+      16:['avengers_score(["Thor", "Iron Man", "Captain America", "Black Widow", "Hulk"])','avengers_score(["Thor","Iron Man","Captain America","Black Widow","Hulk"])']
     }
   }
 };
 
 // AVENGERS/TAMIL dialogues
 const SUCCESS_MSGS=[
-  "🦾 Thanos vanished! Bug fixed, Avenger!",
-  "⚡ Aiyoooo! Perfect fix da! Thor is proud!",
-  "🌟 Correct answer! Even Iron Man is impressed!",
-  "💥 Bug destroyed! Like Hulk smashing puny code!",
-  "🔥 Epdi fix panninga! Superb da!",
-  "✅ Code pached! Captain would salute you!",
-  "🎯 On point! Strange says 'I went forward in time...'",
-  "⚡ Correct! Wakanda forever!"
+  "🦸 Aiyooo! Superb da! Iron Man would retire seeing your fix!",
+  "⚡ SERI DA MACHAN! Bug fix aayiduchu! Avengers cheer panraanga!",
+  "🔨 Thor's hammer approved! Correct fix da!",
+  "💥 HULK SMASH BUG! Correct answer! Neenga best da!",
+  "🌟 Doctor Strange saw 14M futures — all had YOUR fix!",
+  "🐾 Wakanda Forever! Bug vanished like Thanos snap reverse!",
+  "🔥 CORRECTTO! Varisu da neenga! Bug is DEAD!"
 ];
 const FAIL_MSGS=[
-  "💀 Aiyoo! Wrong answer da! -1 Life!",
-  "😤 That's not it. Try harder, Avenger!",
-  "❌ Thanos laughs at your attempt. Try again!",
-  "💔 Iron Man's arc reactor flickered. Wrong!",
-  "🤦 Even Ant-Man could fix this. Try again!",
-  "⚠️ Galactus is unimpressed. Wrong answer!",
-  "😱 Aiyoo paavam! Wrong la! Think again!"
+  "💀 Aiyooo wrong da! Thanos has more logic than this!",
+  "😡 Galactus rofl pannuvaan. Wrong answer da!",
+  "💣 Iron Man arc reactor short-circuit! WRONG!",
+  "😬 Enna koduma saravanan idhu! Wrong answer da!",
+  "😱 Doctor Strange closed the Time Stone reading your answer!",
+  "🦠 Even Groot said it better! WRONG da machaa!"
 ];
 const VIOLATION_MSGS=[
   "⚠️ Tab switch detected! Endgame for cheaters!",
@@ -1801,13 +2216,15 @@ function initFirebase(cfg){
 
   function goToLanding(){
     hideLoading();
-    if(!restoreSession()){
+    const restored = restoreSession();
+    if(!restored){
       showPage('landing');
       const nav=document.getElementById('top-nav');
       if(nav){ nav.classList.add('visible'); document.body.classList.add('nav-visible'); }
       setTimeout(startDialogue, 300);
+      setupGlobalListeners(); // only set up listeners if NOT restoring (restore sets them up itself)
     }
-    setupGlobalListeners();
+    // If restored=true, restoreSession handles navigation + setupGlobalListeners async
   }
 
   // Hard fallback — no matter what, show the app within 2.5s
@@ -1870,19 +2287,68 @@ function setupGlobalListeners(){
       showAnnouncementBanner(snap.val().text);
     }
   });
+  // Listen for admin code changes — sync QUESTIONS live to all browsers
+  db.ref('questions').on('value',snap=>{
+    const qs=snap.val();
+    if(!qs) return;
+    ['1','2','3','s'].forEach(lvl=>{
+      if(!qs[lvl]) return;
+      const q=qs[lvl];
+      QUESTIONS[lvl].code          = q.code          || QUESTIONS[lvl].code;
+      // bugLines: Firebase stores as array, ensure integers
+      if(q.bugLines) QUESTIONS[lvl].bugLines = q.bugLines.map(n=>parseInt(n));
+      QUESTIONS[lvl].expectedOutput= q.expectedOutput || QUESTIONS[lvl].expectedOutput;
+      QUESTIONS[lvl].description   = q.description    || QUESTIONS[lvl].description;
+      // answers: keys may be strings from Firebase, keep as-is (checkAnswer handles both)
+      if(q.answers){
+        QUESTIONS[lvl].answers = q.answers;
+        // Build altAnswers: each key gets [value, trimmed value]
+        const alt={};
+        Object.entries(q.answers).forEach(([n,v])=>{
+          alt[n]  =[v, String(v).trim()];
+          alt[parseInt(n)]=[v, String(v).trim()];
+        });
+        QUESTIONS[lvl].altAnswers = alt;
+      }
+      // If team is currently viewing this level, update the code display live
+      if(currentTeamId && String(currentLevelKey)===String(lvl)){
+        const codeEl=document.getElementById('code-display-'+lvl);
+        if(codeEl && QUESTIONS[lvl].code){
+          codeEl.innerHTML=QUESTIONS[lvl].code.map(l=>
+            `<div class="code-line"><span class="line-num">${l.n}</span><span class="line-code">${escHtml(l.code)}</span></div>`
+          ).join('');
+        }
+        const ansEl=document.getElementById('answer-'+lvl);
+        if(ansEl && QUESTIONS[lvl].code) ansEl.value=QUESTIONS[lvl].code.map(l=>l.code).join('\n');
+        const descEl=document.getElementById('desc-'+lvl);
+        if(descEl) descEl.textContent=QUESTIONS[lvl].description;
+        const eoEl=document.getElementById('expected-output-'+lvl);
+        if(eoEl) eoEl.textContent=QUESTIONS[lvl].expectedOutput;
+        showToast('⚡ Code updated by admin!','info');
+      }
+    });
+  });
 }
 
 function handleEventStateChange(){
   const startedMsg=document.getElementById('event-started-msg');
   const waitingMsg=document.getElementById('event-waiting-msg');
+  const approvalMsg=document.getElementById('event-approval-msg');
   if(eventState.status==='running'){
-    if(startedMsg) startedMsg.style.display='block';
     if(waitingMsg) waitingMsg.style.display='none';
     // Auto-enter game if team is on lobby page
     const lobbyPage=document.getElementById('lobby-page');
     if(lobbyPage&&lobbyPage.style.display!=='none'&&currentTeam&&!currentTeam.disqualified){
-      showToast('🚀 EVENT STARTED! Entering arena...','success');
-      setTimeout(()=>enterGamePage(),1200);
+      if(currentTeam.approved===false){
+        // Pending approval — stay in lobby, show approval message
+        if(startedMsg) startedMsg.style.display='none';
+        if(approvalMsg) approvalMsg.style.display='block';
+      } else {
+        if(startedMsg) startedMsg.style.display='block';
+        if(approvalMsg) approvalMsg.style.display='none';
+        showToast('🚀 EVENT STARTED! Entering arena...','success');
+        setTimeout(()=>enterGamePage(),1200);
+      }
     }
     // If already on game page, sync timer
     const gamePage=document.getElementById('game-page');
@@ -1969,6 +2435,11 @@ function showNavBtn(id){ const el=document.getElementById(id); if(el) el.style.d
 let activePanel=null;
 
 function openPanel(panelId, direction){
+  // If opening register panel and event is running, show pending approval notice
+  if(panelId==='panel-register'){
+    const banner=document.getElementById('reg-closed-banner');
+    if(banner) banner.style.display=eventState.status==='running'?'block':'none';
+  }
   // Fly card out
   const card=document.getElementById('main-card');
   const dirMap={left:'fly-out-left',right:'fly-out-right',up:'fly-out-up',bottom:'fly-out-down'};
@@ -2017,14 +2488,14 @@ function goBackToCard(){
 //  LANDING CARD — FACE FLIP
 // =====================================================================
 const DIALOGUES = [
-  'Bugs are not features. They are crimes against logic.',
-  'The code does not lie. Your logic does.',
-  'En pera kekka vendam, code fix pannu da!',
-  'Even Thanos could not debug what you are about to face.',
-  'Seri da. Kalama iruku. But can you fix it?',
-  'Three levels. One brain. Zero excuses.',
-  'Iron Man had Friday. You have your brain. Good luck.',
-  'Paaru da... somewhere in this code hides the villain.'
+  'Bug fix pannama poita... Thanos snap pannuvaan da! 🤊',
+  'Iron Man sonna \'I am Iron Man\' — Nee sollu \'I fixed the bug!\' ⚡',
+  'En pera kekka vendam, code fix pannu da! 🤬',
+  'Thor hammer vachu bug adipaan — nee brain vachu fix pannu! 🔨',
+  'Hulk SMASH pannuvaan, nee BUG SMASH pannu! 💥',
+  'Easy Medium Hard — Avengers Assemble! 🦸',
+  'Doctor Strange time reverse pannuvaan, nee bug reverse pannu! 🌀',
+  'Code la villain oru bug irukaan... paathu fix pannu da! 🦹'
 ];
 
 let dialogueInterval=null;
@@ -2128,6 +2599,8 @@ function registerTeam(){
   const p2=document.getElementById('reg-p2').value.trim();
   if(!teamName||!p1||!p2){showToast('Fill all fields!','error');return;}
 
+  const needsApproval = (eventState.status === 'running');
+
   const teamData={
     teamName,
     players:[p1,p2],
@@ -2143,7 +2616,10 @@ function registerTeam(){
     secretUnlocked:false,
     disqualified:false,
     timedOut:false,
-    sampleReveals:{1:0,2:0,3:0,s:0}
+    sampleReveals:{1:0,2:0,3:0,s:0},
+    approved: !needsApproval,
+    lateRegister: needsApproval,          // ← mark as late registrant
+    registeredAt: Date.now()              // ← timestamp for sorting
   };
 
   if(demoMode){
@@ -2162,7 +2638,9 @@ function registerTeam(){
     currentTeamId=id;
     currentTeam=teamData;
     localStorage.setItem('jarfix_teamId',id);
-    logActivity(id,'registration','Team registered: '+teamName);
+    localStorage.setItem('jarfix_team',JSON.stringify(teamData));
+    logActivity(id,'registration','Team registered: '+teamName+(needsApproval?' (LATE — pending approval)':''));
+    // Notify admin of late registration via badge
     goToLobby();
   }).catch(e=>showToast('Error: '+e.message,'error'));
 }
@@ -2179,6 +2657,7 @@ function goToLobby(){
   showNavBtn('nav-game');
   listenToEventState();
   loadLobbyTeams();
+  loadLeaderboard();
   // Reset ready/unready button state based on current status
   const readyBtn=document.getElementById('ready-btn');
   const unreadyBtn=document.getElementById('unready-btn');
@@ -2191,7 +2670,22 @@ function goToLobby(){
     if(readyBtn) readyBtn.style.display='';
     if(unreadyBtn) unreadyBtn.style.display='none';
   }
-  showToast('Registered! Welcome '+currentTeam.teamName,'success');
+  // Show correct event message
+  if(eventState.status==='running'){
+    document.getElementById('event-waiting-msg').style.display='none';
+    if(currentTeam.approved===false){
+      // Pending approval — show approval waiting message
+      document.getElementById('event-started-msg').style.display='none';
+      const appr=document.getElementById('event-approval-msg');
+      if(appr) appr.style.display='block';
+      showToast('⏳ Registered! Waiting for admin approval to join the event...','warn');
+    } else {
+      document.getElementById('event-started-msg').style.display='block';
+      showToast('Registered! Welcome '+currentTeam.teamName,'success');
+    }
+  } else {
+    showToast('Registered! Welcome '+currentTeam.teamName,'success');
+  }
 }
 
 function setReady(){
@@ -2227,17 +2721,45 @@ function listenToEventState(){
   db.ref('eventState').on('value',snap=>{
     if(!snap.val()) return;
     eventState=snap.val();
+    const startedMsg=document.getElementById('event-started-msg');
+    const waitingMsg=document.getElementById('event-waiting-msg');
+    const approvalMsg=document.getElementById('event-approval-msg');
     if(eventState.status==='running'){
-      document.getElementById('event-started-msg').style.display='block';
-      document.getElementById('event-waiting-msg').style.display='none';
-      // Auto-enter game from lobby
+      if(waitingMsg) waitingMsg.style.display='none';
       const lobbyPage=document.getElementById('lobby-page');
-      if(lobbyPage&&lobbyPage.style.display!=='none'&&currentTeam&&!currentTeam.disqualified){
-        showToast('🚀 EVENT STARTED! Entering arena...','success');
-        setTimeout(()=>enterGamePage(),1200);
+      if(lobbyPage&&lobbyPage.classList.contains('active')&&currentTeam&&!currentTeam.disqualified){
+        if(currentTeam.approved===false){
+          // Still pending — show waiting for approval
+          if(startedMsg) startedMsg.style.display='none';
+          if(approvalMsg) approvalMsg.style.display='block';
+          showToast('⏳ Event started. Waiting for admin approval...','warn');
+        } else {
+          if(startedMsg) startedMsg.style.display='block';
+          if(approvalMsg) approvalMsg.style.display='none';
+          showToast('🚀 EVENT STARTED! Entering arena...','success');
+          setTimeout(()=>enterGamePage(),1200);
+        }
       }
+    }else if(eventState.status==='stopped'){
+      showToast('Event has ended','info');
     }
   });
+
+  // Listen for admin approving THIS team
+  if(currentTeamId){
+    db.ref('teams/'+currentTeamId+'/approved').on('value',snap=>{
+      if(snap.val()===true && currentTeam && currentTeam.approved===false){
+        // Admin just approved — update local state
+        currentTeam.approved=true;
+        localStorage.setItem('jarfix_team',JSON.stringify(currentTeam));
+        const approvalMsg=document.getElementById('event-approval-msg');
+        if(approvalMsg) approvalMsg.style.display='none';
+        showModal('✅','YOU\'RE APPROVED!','Admin has approved your team!\n\nYou can now enter the arena.',[
+          {label:'ENTER ARENA →',action:()=>{closeModal();enterGamePage();},cls:'btn-green'}
+        ],'gold');
+      }
+    });
+  }
 }
 
 function loadLobbyTeams(){
@@ -2296,6 +2818,11 @@ function adminResetTeam(teamId){
 function enterGamePage(){
   if(!currentTeam) return;
   if(currentTeam.disqualified){showModal('💀','DISQUALIFIED','Your team has been disqualified.',[],'danger');return;}
+  // If event is running and team is not approved, block entry
+  if(eventState.status==='running' && currentTeam.approved===false){
+    showModal('⏳','WAITING FOR APPROVAL','The event is running. Your team is pending admin approval to join.\n\nPlease wait for the admin to approve your team.',[],'');
+    return;
+  }
   updateTeam({status:'In Progress'});
   currentTeam.status='In Progress';
   currentLevelKey=currentTeam.level||1;
@@ -2369,6 +2896,57 @@ function renderLives(count){
   document.getElementById('lives-icons').innerHTML=html;
 }
 
+let gameLbListener=null;
+function toggleGameLeaderboard(){
+  const panel=document.getElementById('game-lb-panel');
+  if(!panel) return;
+  const isOpen=panel.style.display!=='none';
+  if(isOpen){
+    panel.style.display='none';
+    return;
+  }
+  panel.style.display='block';
+  loadGameLeaderboard();
+}
+
+function loadGameLeaderboard(){
+  const el=document.getElementById('game-lb-rows');
+  const upEl=document.getElementById('game-lb-update');
+  if(!el) return;
+  const render=teams=>{
+    const visible=teams.filter(t=>!t.hiddenFromSpec);
+    const sorted=visible.sort((a,b)=>{
+      if(a.disqualified&&!b.disqualified) return 1;
+      if(!a.disqualified&&b.disqualified) return -1;
+      return (b.score||0)-(a.score||0);
+    });
+    if(!sorted.length){el.innerHTML='<div style="color:var(--text-dim);text-align:center;padding:16px;font-size:0.8rem;">No teams yet</div>';return;}
+    el.innerHTML=sorted.map((t,i)=>{
+      const rank=t.disqualified?'DQ':i+1;
+      const medal=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'#'+rank;
+      const isMe=currentTeam&&t.teamName===currentTeam.teamName;
+      const rankColor=rank===1?'var(--gold)':rank===2?'silver':rank===3?'#cd7f32':'var(--text-dim)';
+      return `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;margin-bottom:4px;
+        ${isMe?'background:rgba(0,255,255,0.08);border:1px solid rgba(0,255,255,0.3);':'background:rgba(0,20,0,0.5);border:1px solid rgba(0,255,65,0.08);'}">
+        <span style="font-family:'Orbitron',monospace;font-size:0.9rem;min-width:32px;color:${rankColor};">${medal}</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            ${escHtml(t.teamName)} ${isMe?'<span style="color:var(--cyan);font-size:0.6rem;">← YOU</span>':''}
+          </div>
+          <div style="font-size:0.62rem;color:var(--text-dim);">${(t.players||[]).join(' & ')}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.9rem;color:var(--green);font-weight:900;">${t.score||0}</div>
+          <div style="font-size:0.6rem;color:var(--text-dim);">L${t.level||1}</div>
+        </div>
+      </div>`;
+    }).join('');
+    if(upEl) upEl.textContent='🔴 '+new Date().toLocaleTimeString();
+  };
+  if(demoMode){render(Object.values(demoTeams));return;}
+  if(db) db.ref('teams').on('value',snap=>render(Object.values(snap.val()||{})));
+}
+
 // =====================================================================
 //  TIMER
 // =====================================================================
@@ -2410,6 +2988,10 @@ function tickTimer(){
   if(specT) specT.textContent=display;
   if(remaining===0&&!gracePeriod){
     handleTimerExpiry();
+    // Auto-stop event when global timer hits 0 (admin side)
+    if(adminLoggedIn && eventState.status==='running'){
+      adminAutoStopEvent();
+    }
   }
 }
 
@@ -2542,13 +3124,14 @@ function checkAnswer(answer,q){
     for(const lineNum of q.bugLines){
       const idx=lineNum-1;
       const submitted=norm(submittedLines[idx]||'');
-      const expected=norm(q.answers[lineNum]||'');
-      const alts=(q.altAnswers&&q.altAnswers[lineNum])||[];
+      // Firebase converts int keys to strings — check both
+      const expected=norm(q.answers[lineNum]||q.answers[String(lineNum)]||'');
+      const alts=(q.altAnswers&&(q.altAnswers[lineNum]||q.altAnswers[String(lineNum)]))||[];
       const match=submitted===expected||alts.some(a=>norm(a)===submitted);
       if(!match){allCorrect=false;break;}
     }
     if(allCorrect) return true;
-    // Also allow single-line submission matching the primary answer set
+    // Also allow single-line submission matching any primary answer
     const single=norm(answer);
     const allAnswers=Object.values(q.answers||{});
     if(allAnswers.some(a=>norm(a)===single)) return true;
@@ -2600,11 +3183,13 @@ function handleCorrect(lvl){
   logActivity(currentTeamId,'level_complete','Completed level '+lvl+' +'+totalAdd+' pts');
   // Show success
   const msg=getRand(SUCCESS_MSGS)+`\n+${totalAdd} points!`+(bonusPts>0?` (includes +${bonusPts} finish bonus!)`:'');
-  showModal('🎉','LEVEL CLEARED!',msg,[
-    {label:'NEXT LEVEL →',action:()=>{
+  const _wq=['🦸 Avengers would recruit you da!','🦾 Tony Stark retired seeing your fix!','🐾 Wakanda forever! Bug vanished!','🔨 Thor approved this fix!','💀 Thanos is scared of your skills!','🌟 Enna da neenga! Superstar fix!'];
+  const _mc=['🦸','🦾','⚡','🔥','💥','🌟','🏆'][Math.floor(Math.random()*7)];
+  showMemeModal(_mc,'🎊 LEVEL CLEARED!',msg+'\n\n✨ '+getRand(_wq),[
+    {label:'⚡ NEXT LEVEL →',action:()=>{
       closeModal();
-      currentLevelKey=nextLvl;
-      renderGameLevel(nextLvl);
+      currentLevelKey=currentTeam.level;
+      renderGameLevel(currentTeam.level);
       renderHUD();
       startGlobalTimer();
     },cls:'btn-green'}
@@ -2630,8 +3215,9 @@ function handleWrong(lvl,answer){
     updateTeam({lives:0,status:'Game Over'});
     currentTeam.status='Game Over';
     logActivity(currentTeamId,'game_over','Out of lives on level '+lvl);
-    showModal('💀','GAME OVER',getRand(FAIL_MSGS)+'\n\nYou ran out of lives on Level '+lvl+'!',[
-      {label:'VIEW LEADERBOARD',action:()=>{closeModal();openPanel('panel-leaderboard','right');loadLeaderboard();},cls:'btn-cyan'}
+    const _gq=['Enna koduma saravanan idhu!\nThanos won this round da!','Hulk is literally crying.\nBetter luck, Avenger!','Tony Stark sonna \'We lost.\'\nBut try again da!','Doctor Strange checked 14M futures...\nAll had you retrying!'];
+    showMemeModal('💀','💀 GAME OVER',getRand(_gq)+'\n\n'+getRand(FAIL_MSGS),[
+      {label:'📊 VIEW LEADERBOARD',action:()=>{closeModal();toggleGameLeaderboard();},cls:'btn-cyan'}
     ],'danger');
     // Show game over screen after modal close
     document.getElementById('level-section-over').style.display='none';
@@ -2650,7 +3236,9 @@ function handleWrong(lvl,answer){
   updateTeam({lives:currentTeam.lives});
   renderHUD();
   logActivity(currentTeamId,'wrong_answer','Wrong answer on level '+lvl+', lives left: '+currentTeam.lives);
-  showToast(getRand(FAIL_MSGS),'error');
+  showMemeModal('💥','WRONG ANSWER!',getRand(FAIL_MSGS)+'\n\nLives: '+currentTeam.lives+' ❤️ remaining\nFix the bug and try again!',[
+    {label:'🔧 TRY AGAIN',action:closeModal,cls:'btn-orange'}
+  ],'warn');
   // Add to override queue
   const req={
     id:'ovr_'+Date.now(),
@@ -2753,32 +3341,47 @@ function revealSample(lvl){
 function blockPaste(e){
   if(eventState.status!=='running') return;
   e.preventDefault();
-  showToast(getRand(VIOLATION_MSGS),'error');
   recordViolation('paste');
 }
 function blockCopy(e){
   if(eventState.status!=='running') return;
   e.preventDefault();
-  showToast(getRand(VIOLATION_MSGS),'error');
+  showViolationModal('🚫','COPY BLOCKED','Copying code is not allowed!\n\nDebug it yourself, arena warrior.','warn');
 }
 function blockCut(e){
   if(eventState.status!=='running') return;
   e.preventDefault();
-  showToast(getRand(VIOLATION_MSGS),'error');
+  showViolationModal('🚫','CUT BLOCKED','Cutting code is not allowed during competition!','warn');
 }
 
 document.addEventListener('keydown',e=>{
   if(eventState.status!=='running') return;
+  if(!currentTeamId||adminLoggedIn) return;
+  // Block copy/paste/cut in answer editor
   if((e.ctrlKey||e.metaKey)&&['c','v','x'].includes(e.key.toLowerCase())){
     const activeEl=document.activeElement;
     if(activeEl&&activeEl.classList.contains('answer-editor')){
       e.preventDefault();
-      showToast(getRand(VIOLATION_MSGS),'error');
       recordViolation('keyboard_shortcut');
     }
   }
+  // Block new tab / new window
+  if(e.ctrlKey && (e.key==='t'||e.key==='T'||e.key==='n'||e.key==='N')){
+    e.preventDefault();
+    showViolationModal('🚫','NEW TAB BLOCKED','Opening new tabs or windows is not allowed during the competition!\n\nStay focused on the arena.','warn');
+    recordViolation('new_tab_attempt');
+  }
 });
 
+// Block right-click context menu (which could open new tab)
+document.addEventListener('contextmenu', e=>{
+  if(!currentTeamId || adminLoggedIn) return;
+  if(eventState.status!=='running') return;
+  e.preventDefault();
+  showViolationModal('🚫','RIGHT CLICK BLOCKED','Context menu disabled during competition!','warn');
+});
+
+let tabSwitchModalShown = false;
 document.addEventListener('visibilitychange',()=>{
   if(eventState.status!=='running') return;
   if(!currentTeamId||adminLoggedIn) return;
@@ -2787,6 +3390,20 @@ document.addEventListener('visibilitychange',()=>{
     recordViolation('tab_switch');
   }
 });
+
+function showViolationModal(icon, title, msg, style){
+  const box = document.getElementById('modal-box');
+  const overlay = document.getElementById('modal-overlay');
+  box.className = 'modal';
+  if(style==='danger') box.classList.add('danger-modal');
+  else if(style==='warn') box.classList.add('warn-modal');
+  else if(style==='gold') box.classList.add('gold-modal');
+  document.getElementById('modal-icon').textContent = icon;
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-msg').textContent = msg;
+  document.getElementById('modal-btns').innerHTML = `<button class="btn ${style==='danger'?'btn-red':'btn-orange'}" onclick="closeModal()">I UNDERSTAND</button>`;
+  overlay.classList.add('show');
+}
 
 function recordViolation(type){
   if(!currentTeamId||!currentTeam) return;
@@ -2799,7 +3416,13 @@ function recordViolation(type){
   if(currentTeam.warnings>=2){
     disqualifyTeam(currentTeamId,'Multiple violations: '+type);
   }else{
-    showToast(`⚠️ WARNING ${currentTeam.warnings}/2: -${penalty} pts. ${currentTeam.warnings===1?'Next violation = DQ!':''}`, 'warn');
+    // Show themed warning popup
+    showViolationModal(
+      '⚠️',
+      'VIOLATION DETECTED',
+      `${type==='tab_switch'?'Tab switching':'Violation'} detected!\n\nWarning ${currentTeam.warnings}/2  ·  -${penalty} pts deducted\n\n${currentTeam.warnings===1?'⚠️ ONE MORE VIOLATION = DISQUALIFIED!':''}`,
+      'warn'
+    );
   }
   renderHUD();
 }
@@ -2821,7 +3444,7 @@ function disqualifyTeam(teamId,reason){
     currentTeam=Object.assign(currentTeam||{},update);
     stopTimerInterval();
     showModal('💀','DISQUALIFIED',`Your team has been disqualified!\nReason: ${reason}`,[
-      {label:'VIEW LEADERBOARD',action:()=>{closeModal();openPanel('panel-leaderboard','right');loadLeaderboard();},cls:'btn-red'}
+      {label:'VIEW LEADERBOARD',action:()=>{closeModal();toggleGameLeaderboard();},cls:'btn-red'}
     ],'danger');
   }
   logActivity(teamId,'disqualified',reason);
@@ -2854,6 +3477,7 @@ function checkAdminLogin(){
     listenAdminData();
     startAdminCountdown();
     updateAdminEventStatus();
+    refreshLateBadge();   // Start watching for late registrations
     showToast('Admin access granted','success');
   }else{
     document.getElementById('admin-pw-error').style.display='block';
@@ -2921,88 +3545,171 @@ function setBadge(tab,count){
 }
 
 function adminSwitchTab(tab){
-  const tabs=['teams','lb','overrides','help','logs','codeedit'];
+  const tabs=['teams','late','lb','overrides','help','logs','codeedit','manual'];
   tabs.forEach(t=>{
-    // sidebar nav buttons
     const navBtn=document.getElementById('anav-'+t);
     if(navBtn) navBtn.className='admin-nav-btn'+(t===tab?' active':'');
-    // content panels
     const content=document.getElementById('atab-content-'+t);
     if(content) content.style.display=(t===tab)?'block':'none';
   });
   if(tab==='lb') loadAdminLeaderboard();
+  else if(tab==='late') loadLateRegistrations();
   else if(tab==='overrides') loadAdminOverrides();
   else if(tab==='help') loadHelpRequests();
   else if(tab==='logs') loadActivityLog();
   else if(tab==='codeedit') adminLoadCodeEditor();
-  else loadAdminTeams();
+  else if(tab!=='manual') loadAdminTeams();
 }
 
+// ── Full-textarea code editor helpers ──────────────────────────────────
+
 function adminLoadCodeEditor(){
-  const lvl=document.getElementById('codeedit-level').value;
-  const q=QUESTIONS[lvl];
+  const lvl = document.getElementById('codeedit-level').value;
+  const q   = QUESTIONS[lvl];
   if(!q) return;
-  // Render lines
-  const container=document.getElementById('codeedit-lines');
-  container.innerHTML=q.code.map((l,idx)=>`
-    <div style="display:flex;align-items:center;gap:8px;background:${l.bug?'rgba(255,0,64,0.1)':'rgba(0,20,0,0.6)'};border:1px solid ${l.bug?'var(--red)':'rgba(0,255,65,0.1)'};border-radius:4px;padding:4px 8px;">
-      <span style="color:rgba(0,255,65,0.4);min-width:22px;text-align:right;font-family:'Share Tech Mono',monospace;font-size:0.75rem;">${l.n}</span>
-      <input type="text" id="celine-${idx}" value="${l.code.replace(/"/g,'&quot;')}" style="flex:1;background:transparent;border:none;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;padding:2px 4px;">
-      <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:0.72rem;color:var(--red);white-space:nowrap;">
-        <input type="checkbox" id="cebug-${idx}" ${l.bug?'checked':''} style="accent-color:var(--red);width:14px;height:14px;cursor:pointer;">
-        BUG
-      </label>
-    </div>
-  `).join('');
-  document.getElementById('codeedit-expected').value=q.expectedOutput||'';
-  document.getElementById('codeedit-desc').value=q.description||'';
-  // Add live bug highlight on checkbox change
-  q.code.forEach((_,idx)=>{
-    const cb=document.getElementById('cebug-'+idx);
-    const row=cb&&cb.closest('div');
-    if(cb&&row){
-      cb.addEventListener('change',()=>{
-        row.style.background=cb.checked?'rgba(255,0,64,0.1)':'rgba(0,20,0,0.6)';
-        row.style.borderColor=cb.checked?'var(--red)':'rgba(0,255,65,0.1)';
-      });
+
+  // Fill full code textarea
+  const fullCode = q.code.map(l=>l.code).join('\n');
+  document.getElementById('codeedit-fullcode').value = fullCode;
+
+  // Fill bug lines (1-based, comma-separated)
+  const bugLineNums = (q.bugLines||[]).join(', ');
+  document.getElementById('codeedit-buglines').value = bugLineNums;
+
+  // Fill answers  (format "lineNum:correct code", one per line)
+  const answersText = Object.entries(q.answers||{})
+    .map(([n,v])=>`${n}:${v}`).join('\n');
+  document.getElementById('codeedit-answers').value = answersText;
+
+  document.getElementById('codeedit-expected').value = q.expectedOutput||'';
+  document.getElementById('codeedit-desc').value     = q.description||'';
+
+  // Render preview
+  adminPreviewCode();
+  document.getElementById('codeedit-status').style.display='none';
+}
+
+function adminPreviewCode(){
+  const fullCode  = (document.getElementById('codeedit-fullcode')||{}).value||'';
+  const bugRaw    = (document.getElementById('codeedit-buglines')||{}).value||'';
+  const bugSet    = new Set(
+    bugRaw.split(',').map(s=>parseInt(s.trim())).filter(n=>!isNaN(n))
+  );
+  const lines     = fullCode.split('\n');
+  const preview   = document.getElementById('codeedit-preview');
+  if(!preview) return;
+
+  preview.innerHTML = lines.map((line,i)=>{
+    const lineNum = i+1;
+    const escaped = escHtml(line);
+    if(bugSet.has(lineNum)){
+      return `<span style="background:rgba(255,0,64,0.18);display:block;border-left:3px solid var(--red);padding-left:6px;color:#ff6666;">`
+           + `<span style="color:rgba(255,0,64,0.6);user-select:none;min-width:28px;display:inline-block;text-align:right;padding-right:10px;">${lineNum}</span>`
+           + `${escaped}  <span style="color:rgba(255,0,64,0.6);font-size:0.7rem;">← BUG</span></span>`;
     }
-  });
-  const status=document.getElementById('codeedit-status');
-  status.style.display='none';
+    return `<span style="display:block;padding-left:9px;">`
+         + `<span style="color:rgba(0,255,65,0.3);user-select:none;min-width:28px;display:inline-block;text-align:right;padding-right:10px;">${lineNum}</span>`
+         + `${escaped}</span>`;
+  }).join('');
+}
+
+function adminUpdateLineNumbers(){
+  // Live preview re-render as user types
+  adminPreviewCode();
+}
+
+function adminClearCodeEditor(){
+  if(!confirm('Clear all fields for this level?')) return;
+  document.getElementById('codeedit-fullcode').value='';
+  document.getElementById('codeedit-buglines').value='';
+  document.getElementById('codeedit-answers').value='';
+  document.getElementById('codeedit-expected').value='';
+  document.getElementById('codeedit-desc').value='';
+  document.getElementById('codeedit-preview').innerHTML=
+    '<span style="color:var(--text-dim);">Load a level or paste code above to preview...</span>';
 }
 
 function adminSaveCodeEditor(){
-  const lvl=document.getElementById('codeedit-level').value;
-  const q=QUESTIONS[lvl];
-  if(!q) return;
-  // Read lines back
-  const newCode=q.code.map((l,idx)=>{
-    const inp=document.getElementById('celine-'+idx);
-    const cb=document.getElementById('cebug-'+idx);
-    const code=inp?inp.value:l.code;
-    const bug=cb?cb.checked:false;
-    return {n:l.n, code, ...(bug?{bug:true}:{})};
+  const lvl       = document.getElementById('codeedit-level').value;
+  const fullCode  = document.getElementById('codeedit-fullcode').value;
+  const bugRaw    = document.getElementById('codeedit-buglines').value;
+  const answersRaw= document.getElementById('codeedit-answers').value;
+
+  if(!fullCode.trim()){showToast('Paste the buggy code first!','error');return;}
+
+  // Parse code into line objects
+  const lines   = fullCode.split('\n');
+  const bugLines= bugRaw.split(',').map(s=>parseInt(s.trim())).filter(n=>!isNaN(n));
+  const bugSet  = new Set(bugLines);
+
+  const newCode = lines.map((code,i)=>{
+    const n = i+1;
+    const obj = {n, code};
+    if(bugSet.has(n)) obj.bug = true;
+    return obj;
   });
-  // Extract bug lines
-  const bugLines=newCode.filter(l=>l.bug).map(l=>l.n);
-  QUESTIONS[lvl].code=newCode;
-  QUESTIONS[lvl].bugLines=bugLines;
-  QUESTIONS[lvl].expectedOutput=document.getElementById('codeedit-expected').value;
-  QUESTIONS[lvl].description=document.getElementById('codeedit-desc').value;
-  // Reload display if this level is currently active
-  if(currentLevelKey==lvl||currentLevelKey===lvl){
-    const codeEl=document.getElementById('code-display-'+lvl);
-    if(codeEl){
-      codeEl.innerHTML=newCode.map(l=>`<div class="code-line"><span class="line-num">${l.n}</span><span class="line-code">${escHtml(l.code)}</span></div>`).join('');
+
+  // Parse answers  "lineNum:correct code"
+  const answers = {};
+  const altAnswers = {};
+  answersRaw.split('\n').forEach(line=>{
+    const colon = line.indexOf(':');
+    if(colon<1) return;
+    const n   = parseInt(line.substring(0,colon).trim());
+    const val = line.substring(colon+1); // keep exact indentation
+    if(!isNaN(n)){
+      answers[n]    = val;
+      altAnswers[n] = [val, val.trim()]; // allow trimmed version too
     }
-    const ansEl=document.getElementById('answer-'+lvl);
-    if(ansEl) ansEl.value=newCode.map(l=>l.code).join('\n');
+  });
+
+  // Apply to QUESTIONS object in memory
+  QUESTIONS[lvl].code          = newCode;
+  QUESTIONS[lvl].bugLines      = bugLines;
+  QUESTIONS[lvl].answers       = answers;
+  QUESTIONS[lvl].altAnswers    = altAnswers;
+  QUESTIONS[lvl].expectedOutput= document.getElementById('codeedit-expected').value;
+  QUESTIONS[lvl].description   = document.getElementById('codeedit-desc').value;
+
+  // Push to Firebase so ALL connected team browsers get the updated code
+  const payload = {
+    code:          newCode,
+    bugLines:      bugLines,
+    answers:       answers,
+    expectedOutput:QUESTIONS[lvl].expectedOutput,
+    description:   QUESTIONS[lvl].description,
+    updatedAt:     Date.now()
+  };
+  if(!demoMode && db){
+    db.ref('questions/'+lvl).set(payload)
+      .then(()=>showToast('✅ Code saved to Firebase — all teams will get updated code!','success'))
+      .catch(e=>showToast('Firebase save error: '+e.message,'error'));
   }
-  const status=document.getElementById('codeedit-status');
-  status.textContent='✅ Saved & applied to Level '+lvl+'!';
-  status.style.display='block';
-  logActivity('admin','code_edit','Admin edited Level '+lvl+' code');
-  setTimeout(()=>{ status.style.display='none'; },3000);
+
+  // If the currently active game level is this one, refresh its display live
+  if(String(currentLevelKey) === String(lvl)){
+    const codeEl = document.getElementById('code-display-'+lvl);
+    if(codeEl){
+      codeEl.innerHTML = newCode.map(l=>
+        `<div class="code-line"><span class="line-num">${l.n}</span><span class="line-code">${escHtml(l.code)}</span></div>`
+      ).join('');
+    }
+    const ansEl = document.getElementById('answer-'+lvl);
+    if(ansEl) ansEl.value = newCode.map(l=>l.code).join('\n');
+    const descEl = document.getElementById('desc-'+lvl);
+    if(descEl) descEl.textContent = QUESTIONS[lvl].description;
+    const eoEl = document.getElementById('expected-output-'+lvl);
+    if(eoEl) eoEl.textContent = QUESTIONS[lvl].expectedOutput;
+  }
+
+  // Refresh preview
+  adminPreviewCode();
+
+  const status = document.getElementById('codeedit-status');
+  status.textContent = '✅ Saved & applied to Level '+lvl+'!';
+  status.style.display = 'block';
+  logActivity('admin','code_edit','Admin edited Level '+lvl+' code (full paste)');
+  setTimeout(()=>{ status.style.display='none'; }, 3500);
 }
 
 function adminStartEvent(){
@@ -3057,9 +3764,22 @@ function adminStopEvent(){
   }).catch(e=>showToast('Error: '+e.message,'error'));
 }
 
+function adminAutoStopEvent(){
+  if(eventState.status!=='running') return;
+  const newState={...eventState,status:'stopped',showLeaderboard:true};
+  if(demoMode){eventState=newState;updateAdminEventStatus();showToast('⏰ Timer expired — Event auto-stopped!','warn');return;}
+  db.ref('eventState').set(newState).then(()=>{
+    eventState=newState;
+    updateAdminEventStatus();
+    showToast('⏰ Timer expired — Event auto-stopped & leaderboard broadcast!','warn');
+    logActivity('admin','event_stop','Event auto-stopped at timer expiry');
+  }).catch(e=>showToast('Auto-stop error: '+e.message,'error'));
+}
+
 function adminResetEvent(){
   if(!confirm('⚠️ RESET ALL? Deletes ALL teams, scores, logs. Cannot be undone!')) return;
   const resetState={status:'standby',startTime:null,pausedAt:null,pauseOffset:0};
+  _lbListenerAttached=false;
   if(demoMode){
     eventState=resetState;demoTeams={};overrideQueue=[];helpRequests=[];
     updateAdminEventStatus();loadAdminTeams();
@@ -3109,6 +3829,12 @@ function _runAdminTick(){
     const secs=Math.floor((remaining%60000)/1000);
     el.textContent=`${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
     el.style.color=remaining<60000?'var(--red)':remaining<180000?'var(--orange)':'var(--green)';
+    // Auto-stop event when timer reaches 0
+    if(remaining===0 && eventState.status==='running'){
+      clearInterval(adminTimerInterval);
+      adminTimerInterval=null;
+      adminAutoStopEvent();
+    }
   },1000);
 }
 
@@ -3135,9 +3861,9 @@ function loadAdminTeams(){
     const teams=filterVal==='all'?allTeams:allTeams.filter(([,t])=>(t.status||'Waiting')===filterVal);
     if(!teams.length){tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;color:var(--text-dim);padding:20px;">No teams${filterVal!=='all'?' with status: '+filterVal:''}</td></tr>`;return;}
     tbody.innerHTML=teams.map(([id,t],idx)=>`
-      <tr style="${t.disqualified?'opacity:0.5;':''}">
+      <tr style="${t.disqualified?'opacity:0.5;':''}${t.approved===false?'background:rgba(255,102,0,0.05);border-left:3px solid var(--orange);':''}">
         <td style="color:var(--text-dim);font-size:0.75rem;">${idx+1}</td>
-        <td><b style="font-family:'Orbitron',monospace;font-size:0.8rem;">${escHtml(t.teamName)}</b>${t.ultimateDebugger?'<span style="color:var(--gold);margin-left:4px;">👑</span>':''}</td>
+        <td><b style="font-family:'Orbitron',monospace;font-size:0.8rem;">${escHtml(t.teamName)}</b>${t.ultimateDebugger?'<span style="color:var(--gold);margin-left:4px;">👑</span>':''}${t.approved===false?'<span style="background:rgba(255,102,0,0.2);border:1px solid var(--orange);color:var(--orange);font-size:0.55rem;font-family:\'Orbitron\',monospace;padding:1px 6px;border-radius:10px;margin-left:6px;">⏰LATE</span>':''}</td>
         <td style="font-size:0.78rem;color:var(--text-dim);">${(t.players||[]).join('<br>')}</td>
         <td style="color:var(--green);font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;">${t.score||0}</td>
         <td style="font-family:'Orbitron',monospace;font-size:0.8rem;">L${t.level||1}</td>
@@ -3148,14 +3874,17 @@ function loadAdminTeams(){
           <div style="display:flex;gap:4px;flex-wrap:wrap;">
             ${!t.disqualified?`<button class="btn btn-red btn-sm" style="font-size:0.55rem;padding:4px 8px;" onclick="adminDQ('${id}','${escHtml(t.teamName)}')">💀 DQ</button>`:''}
             ${t.disqualified?`<button class="btn btn-green btn-sm" style="font-size:0.55rem;padding:4px 8px;" onclick="adminReinstate('${id}')">↩ RESTORE</button>`:''}
+            ${!t.approved?`<button class="btn btn-sm" style="font-size:0.55rem;padding:4px 8px;color:var(--orange);border-color:var(--orange);" onclick="adminApproveLateAndStart('${id}','${escHtml(t.teamName)}')">✅ APPROVE</button>`:`<span style="color:var(--green);font-size:0.6rem;font-family:'Orbitron',monospace;">APPROVED</span>`}
+            <button class="btn btn-sm" style="font-size:0.55rem;padding:4px 8px;color:${t.hiddenFromSpec?'var(--orange)':'var(--text-dim)'};border-color:${t.hiddenFromSpec?'var(--orange)':'var(--text-dim)'};" onclick="adminToggleHideSpec('${id}','${escHtml(t.teamName)}')" title="${t.hiddenFromSpec?'Show in spectator':'Hide from spectator'}">${t.hiddenFromSpec?'👁 UNHIDE':'🙈 HIDE'}</button>
             <button class="btn btn-sm" style="font-size:0.55rem;padding:4px 8px;color:var(--orange);border-color:var(--orange);" onclick="adminResetTeam('${id}')">🔄</button>
           </div>
         </td>
       </tr>
     `).join('');
+    refreshLateBadge();
   };
   if(demoMode){render(demoTeams);return;}
-  db.ref('teams').once('value',snap=>render(snap.val()||{}));
+  db.ref('teams').on('value',snap=>render(snap.val()||{}));
 }
 
 function adminDQ(teamId,teamName){
@@ -3170,6 +3899,27 @@ function adminReinstate(teamId){
   logActivity(teamId,'reinstate','Team reinstated by admin');
   loadAdminTeams();
   showToast('Team reinstated','success');
+}
+
+function adminApproveTeam(teamId,teamName){
+  // Redirect to unified approve function
+  adminApproveLateAndStart(teamId,teamName);
+}
+
+function adminToggleHideSpec(teamId,teamName){
+  if(demoMode&&demoTeams[teamId]){
+    demoTeams[teamId].hiddenFromSpec=!demoTeams[teamId].hiddenFromSpec;
+    loadAdminTeams();
+    showToast((demoTeams[teamId].hiddenFromSpec?'🙈 Hidden':'👁 Visible')+': '+teamName+' in spectator','info');
+    return;
+  }
+  db.ref('teams/'+teamId+'/hiddenFromSpec').once('value',snap=>{
+    const current=snap.val()||false;
+    db.ref('teams/'+teamId).update({hiddenFromSpec:!current}).then(()=>{
+      loadAdminTeams();
+      showToast((!current?'🙈 Hidden':'👁 Visible')+': '+teamName+' in spectator view','info');
+    });
+  });
 }
 
 function loadAdminOverrides(){
@@ -3280,6 +4030,271 @@ function loadActivityLog(){
   });
 }
 
+// =====================================================================
+//  LATE REGISTRATIONS
+// =====================================================================
+function loadLateRegistrations(){
+  const el=document.getElementById('late-reg-list');
+  if(!el) return;
+  const render=teamsObj=>{
+    // Late = lateRegister:true OR (approved===false and event was running)
+    const lateTeams=Object.entries(teamsObj||{})
+      .filter(([,t])=>t.lateRegister===true || t.approved===false)
+      .sort((a,b)=>(a[1].registeredAt||0)-(b[1].registeredAt||0)); // oldest first
+
+    const badge=document.getElementById('badge-late');
+    const pendingCount=lateTeams.filter(([,t])=>t.approved===false).length;
+    if(badge){
+      badge.style.display=pendingCount?'inline':'none';
+      badge.textContent=pendingCount;
+    }
+
+    if(!lateTeams.length){
+      el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-dim);font-family:\'Orbitron\',monospace;font-size:0.8rem;">✅ No late registrations</div>';
+      return;
+    }
+
+    el.innerHTML=lateTeams.map(([id,t])=>{
+      const pending = t.approved===false;
+      const regTime = t.registeredAt ? new Date(t.registeredAt).toLocaleTimeString() : '—';
+      return `
+      <div style="background:${pending?'rgba(255,102,0,0.06)':'rgba(0,255,65,0.03)'};border:2px solid ${pending?'rgba(255,102,0,0.4)':'rgba(0,255,65,0.2)'};border-radius:10px;padding:16px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <div style="font-family:'Orbitron',monospace;font-size:0.95rem;color:${pending?'var(--orange)':'var(--green)'};font-weight:900;">${escHtml(t.teamName)}</div>
+              ${pending
+                ? '<span style="background:rgba(255,102,0,0.2);border:1px solid var(--orange);color:var(--orange);font-size:0.6rem;font-family:\'Orbitron\',monospace;padding:2px 8px;border-radius:20px;">⏳ PENDING</span>'
+                : '<span style="background:rgba(0,255,65,0.12);border:1px solid var(--green);color:var(--green);font-size:0.6rem;font-family:\'Orbitron\',monospace;padding:2px 8px;border-radius:20px;">✅ APPROVED</span>'}
+            </div>
+            <div style="font-size:0.78rem;color:var(--text-dim);margin-top:5px;">⚡ ${(t.players||[]).join('  &  ')}</div>
+            <div style="font-size:0.7rem;color:var(--text-dim);margin-top:3px;">🕐 Registered at: <span style="color:var(--cyan);">${regTime}</span>
+              &nbsp;|&nbsp; Score: <span style="color:var(--green);font-family:'Orbitron',monospace;">${t.score||0}</span>
+              &nbsp;|&nbsp; Level: <span style="color:var(--cyan);">L${t.level||1}</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            ${pending ? `
+              <button class="btn btn-sm" style="color:var(--green);border-color:var(--green);font-size:0.72rem;padding:8px 18px;font-family:'Orbitron',monospace;" onclick="adminApproveLateAndStart('${id}','${escHtml(t.teamName)}')">
+                ✅ APPROVE &amp; START
+              </button>
+              <button class="btn btn-red btn-sm" style="font-size:0.7rem;" onclick="adminDenyLate('${id}','${escHtml(t.teamName)}')">💀 DENY</button>
+            ` : `<span style="color:var(--text-dim);font-size:0.72rem;">Already in arena</span>`}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  };
+  if(demoMode){render(demoTeams);return;}
+  db.ref('teams').on('value',snap=>render(snap.val()||{}));
+}
+
+function adminApproveLateAndStart(teamId, teamName){
+  const update={approved:true};
+  if(demoMode&&demoTeams[teamId]) Object.assign(demoTeams[teamId],update);
+  else if(db) db.ref('teams/'+teamId).update(update);
+  logActivity(teamId,'late_approved','Late team approved & auto-started: '+teamName);
+  loadLateRegistrations();
+  showToast('✅ "'+teamName+'" approved — entering arena now!','success');
+  // Team browser listens to /approved → auto-enters game via listenToEventState
+}
+
+function adminDenyLate(teamId, teamName){
+  if(!confirm('Deny "'+teamName+'"? This will disqualify them.')) return;
+  disqualifyTeam(teamId,'Late registration denied by admin');
+  loadLateRegistrations();
+}
+
+function adminApproveAllLate(){
+  if(!confirm('Approve ALL pending late registrations?')) return;
+  const doApprove=teamsObj=>{
+    const lateIds=Object.entries(teamsObj||{})
+      .filter(([,t])=>t.approved===false || t.lateRegister===true)
+      .filter(([,t])=>!t.disqualified)
+      .map(([id])=>id);
+    if(!lateIds.length){showToast('No pending teams','info');return;}
+    if(demoMode){
+      lateIds.forEach(id=>{ if(demoTeams[id]) demoTeams[id].approved=true; });
+      loadLateRegistrations();
+      showToast('✅ All '+lateIds.length+' late teams approved!','success');
+    } else {
+      const updates={};
+      lateIds.forEach(id=>{ updates['teams/'+id+'/approved']=true; });
+      db.ref().update(updates).then(()=>{
+        showToast('✅ All '+lateIds.length+' late teams approved — they enter the arena now!','success');
+        logActivity('admin','late_approve_all',lateIds.length+' late teams bulk approved');
+        loadLateRegistrations();
+      });
+    }
+  };
+  if(demoMode) doApprove(demoTeams);
+  else db.ref('teams').once('value',snap=>doApprove(snap.val()||{}));
+}
+
+// Auto-update late badge when admin is watching teams tab
+function refreshLateBadge(){
+  const updateBadge=teamsObj=>{
+    const count=Object.values(teamsObj||{}).filter(t=>t.approved===false&&!t.disqualified).length;
+    const badge=document.getElementById('badge-late');
+    if(badge){badge.style.display=count?'inline':'none';badge.textContent=count;}
+  };
+  if(demoMode){updateBadge(demoTeams);return;}
+  if(db) db.ref('teams').on('value',snap=>updateBadge(snap.val()||{}));
+}
+
+// =====================================================================
+//  DOWNLOAD CSV / PDF
+// =====================================================================
+function _getAllTeamsData(cb){
+  if(demoMode){ cb(Object.entries(demoTeams)); return; }
+  db.ref('teams').once('value',snap=>cb(Object.entries(snap.val()||{})));
+}
+
+function downloadAllCSV(){
+  _getAllTeamsData(entries=>{
+    const sorted=[...entries].sort((a,b)=>(b[1].score||0)-(a[1].score||0));
+    const rows=[
+      ['Rank','Team Name','Player 1','Player 2','Score','Level','Lives','Status','Warnings','Disqualified','Late Register','Registered At'],
+      ...sorted.map(([,t],i)=>[
+        t.disqualified?'DQ':i+1,
+        t.teamName||'',
+        (t.players||[])[0]||'',
+        (t.players||[])[1]||'',
+        t.score||0,
+        t.level||1,
+        t.lives!=null?t.lives:2,
+        t.status||'Waiting',
+        t.warnings||0,
+        t.disqualified?'Yes':'No',
+        t.lateRegister?'Yes':'No',
+        t.registeredAt?new Date(t.registeredAt).toLocaleString():''
+      ])
+    ];
+    const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+    _downloadFile('jarfix_all_teams_'+_dateStamp()+'.csv', 'text/csv', csv);
+    showToast('✅ CSV downloaded!','success');
+  });
+}
+
+function downloadSeparateCSVs(){
+  _getAllTeamsData(entries=>{
+    if(!entries.length){showToast('No teams to download','error');return;}
+    entries.forEach(([,t])=>{
+      const rows=[
+        ['Field','Value'],
+        ['Team Name', t.teamName||''],
+        ['Player 1', (t.players||[])[0]||''],
+        ['Player 2', (t.players||[])[1]||''],
+        ['Score', t.score||0],
+        ['Level', t.level||1],
+        ['Lives', t.lives!=null?t.lives:2],
+        ['Status', t.status||'Waiting'],
+        ['Warnings', t.warnings||0],
+        ['Disqualified', t.disqualified?'Yes':'No'],
+        ['Late Register', t.lateRegister?'Yes':'No'],
+        ['Registered At', t.registeredAt?new Date(t.registeredAt).toLocaleString():''],
+        ['Completed Levels', (t.completedLevels||[]).join(', ')],
+      ];
+      const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+      const safeName=(t.teamName||'team').replace(/[^a-zA-Z0-9_]/g,'_');
+      _downloadFile('jarfix_'+safeName+'_'+_dateStamp()+'.csv','text/csv',csv);
+    });
+    showToast('✅ '+entries.length+' CSVs downloaded!','success');
+  });
+}
+
+function downloadAllPDF(){
+  _getAllTeamsData(entries=>{
+    const now=new Date().toLocaleString();
+    const allSorted=[...entries].sort((a,b)=>(b[1].score||0)-(a[1].score||0));
+    const regularTeams=allSorted.filter(([,t])=>!t.lateRegister);
+    const lateTeams=allSorted.filter(([,t])=>t.lateRegister);
+
+    const buildRows=(list,startRank=1)=>list.map(([,t],i)=>{
+      const rank=t.disqualified?'DQ':startRank+i;
+      const medal=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank;
+      const regTime=t.registeredAt?new Date(t.registeredAt).toLocaleTimeString():'';
+      const rowBg=t.disqualified?'#1a0000':i%2===0?'#050505':'#0a0a0a';
+      return `<tr style="background:${rowBg};${t.disqualified?'opacity:0.55;':''}">
+        <td style="text-align:center;">${medal}</td>
+        <td><b>${_esc(t.teamName)}</b>${t.ultimateDebugger?' 👑':''}</td>
+        <td>${_esc((t.players||[]).join(' &amp; '))}</td>
+        <td style="color:#00ff41;font-weight:900;font-size:1.05rem;text-align:center;">${t.score||0}</td>
+        <td style="text-align:center;">L${t.level||1}</td>
+        <td style="text-align:center;">${(t.completedLevels||[]).length}</td>
+        <td style="text-align:center;">${t.status||'Waiting'}</td>
+        <td style="text-align:center;color:${(t.warnings||0)>0?'#ff6600':'#666'};">${t.warnings||0}</td>
+        <td style="text-align:center;font-size:0.75rem;color:#666;">${regTime}</td>
+      </tr>`;
+    }).join('');
+
+    const tableHeader=`<tr><th>Rank</th><th>Team</th><th>Players</th><th>Score</th><th>Level</th><th>Done</th><th>Status</th><th>Warn</th><th>Reg. Time</th></tr>`;
+
+    const lateSection=lateTeams.length?`
+      <h2 style="color:#ff6600;margin-top:36px;border-bottom:2px solid #ff6600;padding-bottom:8px;letter-spacing:2px;">
+        ⏰ LATE REGISTRATIONS (${lateTeams.length})
+      </h2>
+      <p style="color:#888;font-size:0.8rem;margin-bottom:12px;">These teams registered after the event started.</p>
+      <table><thead>${tableHeader}</thead><tbody>${buildRows(lateTeams,regularTeams.length+1)}</tbody></table>
+    `:'';
+
+    const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>JarFix NEXUS 2K26 — Results</title>
+<style>
+  *{box-sizing:border-box;}
+  body{font-family:'Courier New',monospace;background:#000;color:#c8ffc8;margin:0;padding:24px;}
+  h1{color:#00ff41;text-align:center;font-size:1.5rem;letter-spacing:4px;border-bottom:2px solid #00ff41;padding-bottom:14px;margin-bottom:6px;}
+  h2{font-size:1rem;letter-spacing:2px;}
+  .meta{text-align:center;color:#555;font-size:0.8rem;margin-bottom:24px;}
+  .summary{display:flex;gap:20px;justify-content:center;margin-bottom:20px;flex-wrap:wrap;}
+  .summary-pill{background:#001a00;border:1px solid #00ff41;border-radius:20px;padding:6px 18px;font-size:0.78rem;color:#00ff41;}
+  table{width:100%;border-collapse:collapse;margin-bottom:16px;}
+  th{background:#001a00;color:#00ff41;padding:9px 8px;text-align:left;font-size:0.75rem;letter-spacing:1px;border-bottom:2px solid #00ff41;}
+  td{padding:7px 8px;border-bottom:1px solid #0a1a0a;font-size:0.8rem;}
+  @media print{
+    body{background:#fff;color:#000;padding:12px;}
+    th{background:#e8ffe8;color:#000;}
+    h1,h2{color:#000;}
+    .summary-pill{background:#f0f0f0;border-color:#333;color:#000;}
+  }
+</style></head><body>
+<h1>⚡ NEXUS TECH 2K26 — JARFIX RESULTS</h1>
+<div class="meta">Generated: ${now} &nbsp;|&nbsp; Total Teams: ${entries.length} &nbsp;|&nbsp; Late Registrations: ${lateTeams.length}</div>
+<div class="summary">
+  <span class="summary-pill">👥 Total: ${entries.length}</span>
+  <span class="summary-pill">⏰ Late: ${lateTeams.length}</span>
+  <span class="summary-pill">💀 DQ: ${entries.filter(([,t])=>t.disqualified).length}</span>
+  <span class="summary-pill">🏆 Completed All: ${entries.filter(([,t])=>(t.completedLevels||[]).length>=3).length}</span>
+</div>
+<h2 style="color:#00ff41;border-bottom:2px solid #00ff41;padding-bottom:8px;letter-spacing:2px;">🏆 MAIN LEADERBOARD (${regularTeams.length} teams)</h2>
+<table><thead>${tableHeader}</thead><tbody>${buildRows(regularTeams)}</tbody></table>
+${lateSection}
+</body></html>`;
+
+    const win=window.open('','_blank','width=1000,height=750');
+    if(!win){showToast('Allow popups to open PDF','error');return;}
+    win.document.write(html);
+    win.document.close();
+    setTimeout(()=>win.print(),600);
+    showToast('📄 PDF ready — use Ctrl+P to save as PDF','success');
+  });
+}
+
+function _dateStamp(){
+  const d=new Date();
+  return d.getFullYear()+''+String(d.getMonth()+1).padStart(2,'0')+''+String(d.getDate()).padStart(2,'0')+'_'+String(d.getHours()).padStart(2,'0')+''+String(d.getMinutes()).padStart(2,'0');
+}
+function _downloadFile(name,type,content){
+  const blob=new Blob([content],{type});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(a.href);},100);
+}
+function _esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
 function loadAdminLeaderboard(){
   const el=document.getElementById('admin-lb-preview');
   if(!el) return;
@@ -3292,10 +4307,10 @@ function loadAdminLeaderboard(){
       const rank=t.disqualified?'DQ':i+1;
       const rankColor=rank===1?'var(--gold)':rank===2?'silver':rank===3?'#cd7f32':'var(--text-dim)';
       return `
-        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(0,255,65,0.08);${t.disqualified?'opacity:0.45;':i<3?'background:rgba(255,215,0,0.03);':''}">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(0,255,65,0.08);${t.disqualified?'opacity:0.45;':i<3?'background:rgba(255,215,0,0.03);':''}${t.hiddenFromSpec?'border-left:3px solid var(--orange);':''}" >
           <span style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;min-width:32px;color:${rankColor};">${rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank}</span>
           <div style="flex:1;">
-            <div style="font-family:'Orbitron',monospace;font-size:0.82rem;font-weight:700;">${escHtml(t.teamName)}${t.ultimateDebugger?'<span style="color:var(--gold);margin-left:4px;">👑</span>':''}</div>
+            <div style="font-family:'Orbitron',monospace;font-size:0.82rem;font-weight:700;">${escHtml(t.teamName)}${t.ultimateDebugger?'<span style="color:var(--gold);margin-left:4px;">👑</span>':''}${t.hiddenFromSpec?'<span style="color:var(--orange);font-size:0.6rem;margin-left:4px;">🙈HIDDEN</span>':''}${!t.approved?'<span style="color:var(--red);font-size:0.6rem;margin-left:4px;">⏳PENDING</span>':''}</div>
             <div style="font-size:0.7rem;color:var(--text-dim);">${(t.players||[]).join(' & ')}</div>
           </div>
           <div style="text-align:right;">
@@ -3307,9 +4322,19 @@ function loadAdminLeaderboard(){
       `;
     }).join('');
     const upd=document.getElementById('admin-lb-update');
-    if(upd) upd.textContent='Updated '+new Date().toLocaleTimeString();
+    if(upd) upd.textContent='Live · '+new Date().toLocaleTimeString();
   };
   if(demoMode){render(Object.values(demoTeams));return;}
+  if(!db){
+    el.innerHTML='<div style="text-align:center;color:var(--text-dim);padding:40px;">Connecting to Firebase...</div>';
+    setTimeout(()=>loadLeaderboard(),1500);
+    return;
+  }
+  if(_lbListenerAttached){
+    db.ref('teams').once('value',snap=>render(Object.values(snap.val()||{})));
+    return;
+  }
+  _lbListenerAttached=true;
   db.ref('teams').on('value',snap=>render(Object.values(snap.val()||{})));
 }
 
@@ -3328,11 +4353,13 @@ function sendAnnouncement(){
 // =====================================================================
 //  LEADERBOARD
 // =====================================================================
+let _lbListenerAttached=false;
 function loadLeaderboard(){
   const el=document.getElementById('leaderboard-rows');
   if(!el) return;
   const render=teams=>{
-    const sorted=teams.sort((a,b)=>{
+    const visible=teams.filter(t=>!t.hiddenFromSpec);
+    const sorted=visible.sort((a,b)=>{
       if(a.disqualified&&!b.disqualified) return 1;
       if(!a.disqualified&&b.disqualified) return -1;
       return (b.score||0)-(a.score||0);
@@ -3344,24 +4371,46 @@ function loadLeaderboard(){
       if(rank===1) rankClass='rank-1';
       if(rank===2) rankClass='rank-2';
       if(rank===3) rankClass='rank-3';
+      const isMe=currentTeam&&t.teamName===currentTeam.teamName;
+      const lvlProgress=['1','2','3','s'].map(l=>{
+        const done=(t.completedLevels||[]).map(String).includes(String(l));
+        const active=String(t.level||1)===String(l)&&!done;
+        return `<span style="display:inline-block;width:16px;height:16px;border-radius:50%;font-size:0.55rem;line-height:16px;text-align:center;
+          background:${done?'var(--green)':active?'var(--orange)':'rgba(255,255,255,0.1)'};
+          color:${done||active?'#000':'var(--text-dim)'};
+          font-family:'Orbitron',monospace;font-weight:900;">${l==='s'?'S':l}</span>`;
+      }).join('');
       return `
-        <div class="lb-row ${rankClass} ${t.disqualified?'dq':''}">
-          <div class="lb-rank ${rankClass}">${rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank}</div>
-          <div class="lb-team">
-            <div class="lb-team-name">${escHtml(t.teamName)} ${t.ultimateDebugger?'👑':''}</div>
-            <div class="lb-players">${(t.players||[]).join(' & ')}</div>
+        <div class="lb-row ${rankClass} ${t.disqualified?'dq':''}" style="${isMe?'border-color:var(--cyan);box-shadow:0 0 14px rgba(0,255,255,0.25);':''}">
+          <div class="lb-rank ${rankClass}" style="min-width:40px;">${rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'#'+rank}</div>
+          <div class="lb-team" style="flex:1;">
+            <div class="lb-team-name">${escHtml(t.teamName)} ${t.ultimateDebugger?'👑':''} ${isMe?'<span style="color:var(--cyan);font-size:0.65rem;">← YOU</span>':''}</div>
+            <div class="lb-players" style="margin-top:2px;">${(t.players||[]).join(' & ')}</div>
+            <div style="margin-top:6px;display:flex;gap:3px;align-items:center;">${lvlProgress}
+              <span style="font-size:0.65rem;color:var(--text-dim);margin-left:6px;">${(t.completedLevels||[]).length} level${(t.completedLevels||[]).length===1?'':'s'} done</span>
+            </div>
           </div>
-          <div>
+          <div style="text-align:right;min-width:70px;">
             <div class="lb-score">${t.score||0}</div>
-            ${t.disqualified?'<div style="color:var(--red);font-size:0.7rem;font-family:\'Orbitron\',monospace;">DISQUALIFIED</div>':''}
+            <div style="font-size:0.65rem;color:var(--text-dim);margin-top:2px;">${t.disqualified?'<span style="color:var(--red);font-family:\'Orbitron\',monospace;">DQ</span>':t.status||''}</div>
           </div>
-          <div class="lb-level">Level ${t.level||1}<br><span style="font-size:0.7rem;">${t.status||''}</span></div>
         </div>
       `;
     }).join('');
-    document.getElementById('lb-last-update').textContent='Updated '+new Date().toLocaleTimeString();
+    const upEl=document.getElementById('lb-last-update');
+    if(upEl) upEl.textContent='🔴 Live · '+new Date().toLocaleTimeString();
   };
   if(demoMode){render(Object.values(demoTeams));return;}
+  if(!db){
+    el.innerHTML='<div style="text-align:center;color:var(--text-dim);padding:40px;">Connecting to Firebase...</div>';
+    setTimeout(()=>loadLeaderboard(),1500);
+    return;
+  }
+  if(_lbListenerAttached){
+    db.ref('teams').once('value',snap=>render(Object.values(snap.val()||{})));
+    return;
+  }
+  _lbListenerAttached=true;
   db.ref('teams').on('value',snap=>render(Object.values(snap.val()||{})));
 }
 
@@ -3409,7 +4458,7 @@ function tickSpecTimer(){
 function renderSpec(){
   const el=document.getElementById('spec-content');
   if(!el) return;
-  const teams=Object.values(spectatorTeams);
+  const teams=Object.values(spectatorTeams).filter(t=>!t.hiddenFromSpec);
   if(specView==='lb'){
     const sorted=teams.sort((a,b)=>(b.score||0)-(a.score||0));
     el.innerHTML=`
@@ -3487,7 +4536,7 @@ function renderSpec(){
 }
 
 function updateTicker(){
-  const teams=Object.values(spectatorTeams).sort((a,b)=>(b.score||0)-(a.score||0));
+  const teams=Object.values(spectatorTeams).filter(t=>!t.hiddenFromSpec).sort((a,b)=>(b.score||0)-(a.score||0));
   const text=teams.map((t,i)=>`#${i+1} ${t.teamName}: ${t.score||0}pts`).join('   |   ');
   const el=document.getElementById('score-ticker');
   if(el) el.textContent=text||'Waiting for teams...';
@@ -3537,6 +4586,10 @@ function showToast(msg,type='info'){
   setTimeout(()=>toast.remove(),7000);
 }
 
+function showMemeModal(icon,title,msg,buttons=[],style=''){
+  showModal(icon,title,msg,buttons,style);
+  setTimeout(()=>{const box=document.getElementById('modal-box');if(box){box.classList.add('meme-shake');setTimeout(()=>box.classList.remove('meme-shake'),450);}},60);
+}
 function showModal(icon,title,msg,buttons=[],style=''){
   document.getElementById('modal-icon').textContent=icon;
   document.getElementById('modal-title').textContent=title;
@@ -3545,7 +4598,8 @@ function showModal(icon,title,msg,buttons=[],style=''){
   const box=document.getElementById('modal-box');
   box.className='modal';
   if(style==='danger') box.classList.add('danger-modal');
-  if(style==='gold') box.classList.add('gold-modal');
+  else if(style==='gold') box.classList.add('gold-modal');
+  else if(style==='warn') box.classList.add('warn-modal');
   if(!buttons.length){
     btnsEl.innerHTML='<button class="btn btn-green" onclick="closeModal()">OK</button>';
   }else{
@@ -3623,18 +4677,104 @@ function closeWinnerScreen(){
 //  BROWSER PERSISTENCE
 // =====================================================================
 function restoreSession(){
-  // Session restore disabled — always start fresh from landing
+  // Try to restore team session from localStorage
+  const savedId   = localStorage.getItem('jarfix_teamId');
+  const savedTeam = localStorage.getItem('jarfix_team');
+  if(!savedId || !savedTeam) return false;
+
+  try {
+    currentTeamId = savedId;
+    currentTeam   = JSON.parse(savedTeam);
+  } catch(e){ return false; }
+
+  if(!currentTeam || !currentTeam.teamName) return false;
+
+  // Show loading state while we re-fetch fresh data from Firebase
+  if(!demoMode && db){
+    db.ref('teams/'+currentTeamId).once('value', snap=>{
+      if(!snap.val()){
+        // Team no longer exists — clear session
+        localStorage.removeItem('jarfix_teamId');
+        localStorage.removeItem('jarfix_team');
+        showPage('landing');
+        setTimeout(startDialogue,300);
+        return;
+      }
+      // Refresh team data from Firebase
+      currentTeam = snap.val();
+      localStorage.setItem('jarfix_team', JSON.stringify(currentTeam));
+
+      // Also fetch current event state
+      db.ref('eventState').once('value', esnap=>{
+        if(esnap.val()) eventState = esnap.val();
+
+        // Decide which page to restore to
+        if(currentTeam.disqualified || currentTeam.timedOut || currentTeam.status==='Game Over'){
+          // Restore to game page (shows game-over section)
+          _restoreToGame();
+        } else if(eventState.status==='running' && currentTeam.approved!==false && currentTeam.status==='In Progress'){
+          // Was actively playing — restore to game page
+          _restoreToGame();
+        } else {
+          // Was in lobby (waiting, ready, or pending approval) — restore to lobby
+          _restoreToLobby();
+        }
+      });
+    });
+    return true; // We're handling the navigation asynchronously
+  } else if(demoMode) {
+    _restoreToLobby();
+    return true;
+  }
   return false;
 }
 
-// Clear any saved session on every fresh page load
-(function clearSessionOnLoad(){
-  localStorage.removeItem('jarfix_teamId');
-  localStorage.removeItem('jarfix_team');
-  localStorage.removeItem('jarfix_demo');
-  // Clear any refresh count keys
-  Object.keys(localStorage).forEach(k=>{ if(k.startsWith('jarfix_refresh_')) localStorage.removeItem(k); });
-})();
+function _restoreToLobby(){
+  showPage('lobby-page');
+  document.getElementById('lobby-team-name').textContent = currentTeam.teamName;
+  document.getElementById('lobby-p1').textContent        = currentTeam.players[0]||'';
+  document.getElementById('lobby-p2').textContent        = currentTeam.players[1]||'';
+  document.getElementById('game-team-name-display').textContent = currentTeam.teamName;
+  const nav=document.getElementById('top-nav');
+  if(nav){ nav.classList.add('visible'); document.body.classList.add('nav-visible'); }
+  showHelp();
+  listenToEventState();
+  loadLobbyTeams();
+  loadLeaderboard();
+  // Show correct event status message
+  if(eventState.status==='running'){
+    document.getElementById('event-waiting-msg').style.display='none';
+    if(currentTeam.approved===false){
+      document.getElementById('event-started-msg').style.display='none';
+      const appr=document.getElementById('event-approval-msg');
+      if(appr) appr.style.display='block';
+    } else {
+      document.getElementById('event-started-msg').style.display='block';
+    }
+  }
+  showToast('Welcome back, '+currentTeam.teamName+'!','success');
+  setupGlobalListeners();
+}
+
+function _restoreToGame(){
+  const nav=document.getElementById('top-nav');
+  if(nav){ nav.classList.add('visible'); document.body.classList.add('nav-visible'); }
+  showHelp();
+  currentLevelKey = currentTeam.level||1;
+  sampleReveals   = currentTeam.sampleReveals||{1:0,2:0,3:0,s:0};
+  showPage('game-page');
+  document.getElementById('game-team-name-display').textContent = currentTeam.teamName;
+  renderGameLevel(currentLevelKey);
+  renderHUD();
+  if(eventState.status==='running') startGlobalTimer();
+  listenTeamUpdates();
+  listenRankUpdate();
+  listenGlobalLeaderboardSignal();
+  showToast('Welcome back, '+currentTeam.teamName+'! Resuming game...','success');
+  setupGlobalListeners();
+}
+
+// Session is preserved across refreshes — cleared only on explicit logout/reset
 
 // =====================================================================
 //  HARDCODED FIREBASE CONFIG — NEXUS TECH 2K26
